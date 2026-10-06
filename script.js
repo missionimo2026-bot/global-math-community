@@ -1,514 +1,920 @@
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+/* =====================================================
+   MISSION IMO V1
+   SUPABASE CONNECTION
+   ===================================================== */
 
-html{
-scroll-behavior:smooth;
-}
 
-body{
-font-family:Arial,Helvetica,sans-serif;
-background:#070b16;
-color:white;
-line-height:1.6;
-}
+/* =====================================================
+   SUPABASE CONFIG
+   =====================================================
 
-a{
-text-decoration:none;
-color:inherit;
-}
+   Replace ONLY these two values.
 
-button,input,textarea,select{
-font:inherit;
-}
+   Get them from:
+   Supabase → Project Settings → API
 
-.navbar{
-position:sticky;
-top:0;
-z-index:1000;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:18px 7%;
-background:rgba(7,11,22,.97);
-border-bottom:1px solid #20283f;
-}
+   Use the project URL and PUBLIC/PUBLISHABLE key.
 
-.logo{
-font-size:22px;
-font-weight:bold;
-}
+   NEVER use the service-role/secret key here.
+*/
 
-.logo span{
-color:#8995ff;
-}
+const SUPABASE_URL =
+"https://pizpxdjeccykzjqrccyq.supabase.co";
 
-nav{
-display:flex;
-gap:20px;
-}
+const SUPABASE_KEY =
+"sb_publishable_OCkcysCFZT8ostIe78wFZQ_McPcgAH_";
 
-nav a{
-color:#aeb7d1;
-font-size:14px;
-}
 
-.menu-btn{
-display:none;
-background:none;
-border:none;
-color:white;
-font-size:25px;
-}
+const db =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
-.hero{
-min-height:85vh;
-display:flex;
-align-items:center;
-padding:80px 8%;
-background:
-radial-gradient(circle at 75% 30%,#242f70,transparent 35%),
-#070b16;
-}
 
-.hero-content{
-max-width:800px;
-}
+/* =====================================================
+   MENU
+   ===================================================== */
 
-.tag,
-.section-label{
-color:#8995ff;
-font-size:12px;
-font-weight:bold;
-letter-spacing:2px;
-}
+function toggleMenu(){
 
-.hero h1{
-margin-top:20px;
-font-size:clamp(60px,10vw,105px);
-line-height:.93;
-}
+const nav =
+document.getElementById("nav");
 
-.hero h1 span{
-color:#8995ff;
-}
+nav.classList.toggle("open");
 
-.hero-text{
-max-width:650px;
-margin-top:30px;
-color:#aeb7d1;
-font-size:18px;
 }
 
-.buttons{
-display:flex;
-gap:15px;
-margin-top:35px;
-}
 
-.button{
-display:inline-block;
-padding:13px 22px;
-border:none;
-border-radius:9px;
-cursor:pointer;
-font-weight:bold;
-}
+/* =====================================================
+   PROBLEM OF THE DAY
+   ===================================================== */
 
-.primary{
-background:white;
-color:#070b16;
-}
+function showAnswer(){
 
-.secondary{
-border:1px solid #414b69;
-color:white;
-background:transparent;
-}
+document.getElementById("answer")
+.textContent =
+"Answer: 8 🎉";
 
-.stats{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-border-top:1px solid #20283f;
-border-bottom:1px solid #20283f;
 }
 
-.stats div{
-padding:30px;
-text-align:center;
-border-right:1px solid #20283f;
-}
 
-.stats strong{
-font-size:25px;
-}
+/* =====================================================
+   AUTH MESSAGE
+   ===================================================== */
 
-.stats p{
-color:#9da7c3;
-}
+function authMessage(message){
 
-.section{
-padding:100px 8%;
-}
+document.getElementById("authMessage")
+.textContent = message;
 
-.section h2{
-margin-top:15px;
-font-size:clamp(42px,7vw,72px);
-line-height:1.05;
 }
 
-.section-description{
-max-width:650px;
-margin-top:25px;
-color:#aeb7d1;
-font-size:17px;
-}
 
-.cards,
-.challenge-grid,
-.member-list{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:20px;
-margin-top:50px;
-}
+/* =====================================================
+   SIGN UP
+   ===================================================== */
 
-.card,
-.challenge,
-.member,
-.post{
-padding:28px;
-background:#10172c;
-border:1px solid #242d49;
-border-radius:15px;
-}
+async function signUp(){
 
-.card h3,
-.challenge h3{
-margin-top:18px;
-font-size:24px;
-}
+const email =
+document.getElementById("email").value.trim();
 
-.card p,
-.challenge p,
-.member p,
-.post p{
-margin-top:10px;
-color:#9da7c3;
-}
+const password =
+document.getElementById("password").value;
 
-.icon{
-font-size:35px;
-}
+const username =
+document.getElementById("username").value.trim();
 
-.problem-section{
-padding:100px 8%;
-background:#0d1325;
-}
+const country =
+document.getElementById("country").value.trim();
 
-.problem-box{
-max-width:800px;
-margin:auto;
-padding:50px;
-text-align:center;
-background:#111a34;
-border:1px solid #293456;
-border-radius:20px;
-}
+const interests =
+document.getElementById("interests").value.trim();
 
-.problem-box h2{
-margin-top:15px;
-font-size:50px;
-}
+const bio =
+document.getElementById("bio").value.trim();
 
-.difficulty{
-display:inline-block;
-margin-top:20px;
-padding:5px 12px;
-border-radius:20px;
-background:#162d23;
-color:#6ee7a3;
-font-size:12px;
-}
 
-.problem{
-margin-top:30px;
-padding:25px;
-background:#080d1c;
-border-radius:12px;
-font-size:18px;
-}
+if(!email || !password || !username){
 
-.solve-button{
-margin-top:25px;
-padding:12px 22px;
-border:none;
-border-radius:8px;
-background:white;
-cursor:pointer;
-font-weight:bold;
-}
+authMessage(
+"Please enter email, password and username."
+);
 
-.answer{
-margin-top:20px;
-color:#7ee7a5;
-font-weight:bold;
-}
+return;
 
-.community{
-background:#0a0f1e;
 }
 
-.member-list{
-margin-top:40px;
-}
 
-.member-avatar{
-font-size:30px;
-}
+if(password.length < 6){
 
-.empty{
-padding:30px;
-color:#9da7c3;
-border:1px dashed #414b69;
-border-radius:12px;
-}
+authMessage(
+"Password must be at least 6 characters."
+);
 
-.post-list{
-display:grid;
-gap:18px;
-margin-top:40px;
-}
+return;
 
-.new-post{
-max-width:700px;
-margin-top:35px;
 }
 
-input,
-textarea,
-select{
-display:block;
-width:100%;
-margin:12px 0;
-padding:14px;
-border:1px solid #303b5c;
-border-radius:8px;
-background:#10172c;
-color:white;
-outline:none;
-}
 
-textarea{
-min-height:130px;
-resize:vertical;
-}
+authMessage("Creating your account...");
 
-select{
-margin-bottom:20px;
-}
 
-.auth-section{
-background:#0a0f1e;
-}
+const result =
+await db.auth.signUp({
 
-.auth-section input,
-.auth-section textarea{
-max-width:650px;
-}
+email:email,
+password:password
 
-.auth-buttons{
-display:flex;
-gap:12px;
-margin-top:20px;
-}
+});
+
+
+if(result.error){
+
+authMessage(
+result.error.message
+);
+
+return;
 
-.form-message{
-margin-top:20px;
-color:#7ee7a5;
-font-weight:bold;
 }
 
-.table-wrapper{
-overflow-x:auto;
-margin-top:45px;
+
+const user =
+result.data.user;
+
+
+if(!user){
+
+authMessage(
+"Account created. Please check your email."
+);
+
+return;
+
 }
+
+
+/*
+The database trigger creates the profile automatically.
+We then update the profile with the information entered.
+*/
+
+const profileUpdate =
+await db
+.from("profiles")
+.update({
+
+username:username,
+country:country,
+interests:interests,
+bio:bio
 
-table{
-width:100%;
-border-collapse:collapse;
-background:#10172c;
+})
+.eq("id",user.id);
+
+
+if(profileUpdate.error){
+
+authMessage(
+"Account created, but profile setup needs another try."
+);
+
+return;
+
 }
 
-th,
-td{
-padding:18px;
-border-bottom:1px solid #242d49;
-text-align:left;
+
+authMessage(
+"Account created successfully! 🚀"
+);
+
+await refreshUser();
+
 }
+
+
+/* =====================================================
+   LOGIN
+   ===================================================== */
 
-th{
-color:#8995ff;
+async function signIn(){
+
+const email =
+document.getElementById("email").value.trim();
+
+const password =
+document.getElementById("password").value;
+
+
+if(!email || !password){
+
+authMessage(
+"Enter your email and password."
+);
+
+return;
+
 }
+
+
+authMessage("Logging in...");
+
+
+const result =
+await db.auth.signInWithPassword({
 
-.global{
-padding:130px 8%;
-text-align:center;
-background:
-radial-gradient(circle,#202b60,transparent 45%),
-#070b16;
+email:email,
+password:password
+
+});
+
+
+if(result.error){
+
+authMessage(
+result.error.message
+);
+
+return;
+
 }
+
 
-.global h2{
-margin-top:15px;
-font-size:clamp(48px,8vw,85px);
-line-height:1;
+authMessage(
+"Welcome back! 🚀"
+);
+
+await refreshUser();
+
 }
+
 
-.global p{
-max-width:650px;
-margin:25px auto;
-color:#aeb7d1;
+/* =====================================================
+   LOGOUT
+   ===================================================== */
+
+async function signOut(){
+
+await db.auth.signOut();
+
+document
+.getElementById("authBox")
+.classList.remove("hidden");
+
+document
+.getElementById("loggedInBox")
+.classList.add("hidden");
+
+document
+.getElementById("newPostArea")
+.classList.add("hidden");
+
+document
+.getElementById("postList")
+.innerHTML =
+'<div class="empty">Login to see community discussions.</div>';
+
 }
+
+
+/* =====================================================
+   CURRENT USER
+   ===================================================== */
+
+async function getUser(){
 
-.world{
-margin:40px 0;
-font-size:70px;
+const result =
+await db.auth.getUser();
+
+return result.data.user;
+
 }
+
+
+/* =====================================================
+   REFRESH USER UI
+   ===================================================== */
+
+async function refreshUser(){
 
-.rules-box{
-max-width:700px;
-margin-top:40px;
-padding:30px;
-background:#10172c;
-border-radius:12px;
+const user =
+await getUser();
+
+
+if(!user){
+
+return;
+
 }
+
 
-.rules-box p{
-margin:12px 0;
-color:#c4cbe0;
+document
+.getElementById("authBox")
+.classList.add("hidden");
+
+document
+.getElementById("loggedInBox")
+.classList.remove("hidden");
+
+document
+.getElementById("newPostArea")
+.classList.remove("hidden");
+
+
+document
+.getElementById("userInfo")
+.textContent =
+"Logged in as " + user.email;
+
+
+await loadMembers();
+await loadPosts();
+await loadLeaderboard();
+await loadChallenges();
+
 }
+
+
+/* =====================================================
+   LOAD MEMBERS
+   ===================================================== */
+
+async function loadMembers(){
+
+const container =
+document.getElementById("memberList");
 
-.about{
-max-width:950px;
-margin:auto;
+
+const result =
+await db
+.from("profiles")
+.select(
+"username,country,interests,bio"
+)
+.order(
+"created_at",
+{ascending:false}
+);
+
+
+if(result.error){
+
+container.innerHTML =
+'<div class="empty">Unable to load community.</div>';
+
+return;
+
 }
+
+
+const members =
+result.data;
+
+
+if(!members.length){
 
-.about>p:not(.section-label){
-margin-top:20px;
-color:#aeb7d1;
-font-size:18px;
+container.innerHTML =
+'<div class="empty">No members yet.</div>';
+
+return;
+
 }
+
+
+container.innerHTML = "";
+
+
+members.forEach(member => {
+
+const card =
+document.createElement("div");
+
+card.className = "member";
+
+
+const username =
+escapeHTML(
+member.username
+);
+
+const country =
+escapeHTML(
+member.country || ""
+);
 
-.mission-box{
-margin-top:40px;
-padding:30px;
-background:#10172c;
-border-left:4px solid #8995ff;
-border-radius:10px;
+const interests =
+escapeHTML(
+member.interests || "Mathematics"
+);
+
+
+card.innerHTML =
+
+'<div class="member-avatar">🧑‍🎓</div>' +
+
+'<h3>' +
+username +
+'</h3>' +
+
+'<p>🌍 ' +
+country +
+'</p>' +
+
+'<p>🧠 ' +
+interests +
+'</p>';
+
+
+container.appendChild(card);
+
+});
+
 }
 
-.mission-box p{
-margin-top:8px;
-color:#aeb7d1;
+
+/* =====================================================
+   CREATE POST
+   ===================================================== */
+
+async function createPost(){
+
+const user =
+await getUser();
+
+
+if(!user){
+
+alert("Please login first.");
+
+return;
+
 }
+
+
+const title =
+document
+.getElementById("postTitle")
+.value
+.trim();
+
+const content =
+document
+.getElementById("postContent")
+.value
+.trim();
 
-footer{
-padding:50px 8%;
-border-top:1px solid #20283f;
-color:#8992ad;
+
+if(!title || !content){
+
+alert("Write a title and message.");
+
+return;
+
 }
+
+
+const result =
+await db
+.from("posts")
+.insert({
+
+user_id:user.id,
+title:title,
+content:content
+
+});
+
+
+if(result.error){
 
-.footer-logo{
-color:white;
-font-size:20px;
-font-weight:bold;
+alert(result.error.message);
+
+return;
+
 }
+
+
+document
+.getElementById("postTitle")
+.value = "";
+
+document
+.getElementById("postContent")
+.value = "";
 
-footer p{
-margin-top:10px;
+
+await loadPosts();
+
 }
+
+
+/* =====================================================
+   LOAD POSTS
+   ===================================================== */
+
+async function loadPosts(){
 
-.hidden{
-display:none!important;
+const container =
+document.getElementById("postList");
+
+
+const result =
+await db
+.from("posts")
+.select(
+"id,title,content,user_id,created_at"
+)
+.order(
+"created_at",
+{ascending:false}
+)
+.limit(50);
+
+
+if(result.error){
+
+container.innerHTML =
+'<div class="empty">Unable to load discussions.</div>';
+
+return;
+
 }
+
+
+const posts =
+result.data;
+
 
-@media(max-width:750px){
+if(!posts.length){
 
-.navbar{
-flex-wrap:wrap;
+container.innerHTML =
+'<div class="empty">No discussions yet. Start the first one!</div>';
+
+return;
+
 }
+
+
+container.innerHTML = "";
+
+
+posts.forEach(post => {
+
+const card =
+document.createElement("article");
+
+card.className = "post";
+
+
+card.innerHTML =
+
+'<h3>' +
+escapeHTML(post.title) +
+'</h3>' +
 
-nav{
-display:none;
-width:100%;
-flex-direction:column;
-padding-top:15px;
-text-align:center;
+'<p>' +
+escapeHTML(post.content) +
+'</p>' +
+
+'<button class="button secondary" ' +
+'onclick="reportPost(' +
+post.id +
+')">' +
+"🚩 Report" +
+"</button>";
+
+
+container.appendChild(card);
+
+});
+
 }
+
+
+/* =====================================================
+   REPORT POST
+   ===================================================== */
+
+async function reportPost(postId){
+
+const user =
+await getUser();
+
 
-nav.open{
-display:flex;
+if(!user){
+
+alert("Please login first.");
+
+return;
+
 }
+
+
+const reason =
+prompt(
+"Why are you reporting this post?"
+);
 
-.menu-btn{
-display:block;
+
+if(!reason){
+
+return;
+
 }
+
+
+const result =
+await db
+.from("reports")
+.insert({
 
-.hero{
-padding:70px 6%;
+reporter_id:user.id,
+post_id:postId,
+reason:reason
+
+});
+
+
+if(result.error){
+
+alert(result.error.message);
+
+return;
+
 }
+
 
-.hero h1{
-font-size:60px;
+alert(
+"Report submitted. Thank you."
+);
+
 }
+
+
+/* =====================================================
+   SUBMIT PROBLEM
+   ===================================================== */
 
-.buttons{
-flex-direction:column;
+async function submitProblem(){
+
+const user =
+await getUser();
+
+
+if(!user){
+
+document
+.getElementById("problemMessage")
+.textContent =
+"Please login before submitting a problem.";
+
+return;
+
 }
+
+
+const problem =
+document
+.getElementById("problemInput")
+.value
+.trim();
+
+
+const difficulty =
+document
+.getElementById("problemDifficulty")
+.value;
+
 
-.button{
-text-align:center;
+if(!problem){
+
+document
+.getElementById("problemMessage")
+.textContent =
+"Write a problem first.";
+
+return;
+
 }
+
+
+const result =
+await db
+.from("problems")
+.insert({
+
+user_id:user.id,
+problem:problem,
+difficulty:difficulty
+
+});
+
+
+if(result.error){
+
+document
+.getElementById("problemMessage")
+.textContent =
+result.error.message;
 
-.stats{
-grid-template-columns:repeat(2,1fr);
+return;
+
 }
+
+
+document
+.getElementById("problemInput")
+.value = "";
+
+
+document
+.getElementById("problemMessage")
+.textContent =
+"Problem submitted successfully! 🧩";
 
-.stats div{
-border-bottom:1px solid #20283f;
 }
+
+
+/* =====================================================
+   LOAD CHALLENGES
+   ===================================================== */
+
+async function loadChallenges(){
+
+const container =
+document.getElementById("challengeList");
+
 
-.cards,
-.challenge-grid,
-.member-list{
-grid-template-columns:1fr;
+const result =
+await db
+.from("challenges")
+.select("*")
+.order("id");
+
+
+if(result.error){
+
+container.innerHTML =
+'<div class="empty">Unable to load challenges.</div>';
+
+return;
+
 }
+
+
+container.innerHTML = "";
+
+
+result.data.forEach(challenge => {
+
+const card =
+document.createElement("div");
 
-.section{
-padding:75px 6%;
+card.className = "challenge";
+
+
+card.innerHTML =
+
+'<span>🏆</span>' +
+
+'<h3>' +
+escapeHTML(challenge.title) +
+'</h3>' +
+
+'<p>' +
+escapeHTML(
+challenge.description || ""
+) +
+'</p>' +
+
+'<p>⭐ ' +
+challenge.points +
+" points</p>";
+
+
+container.appendChild(card);
+
+});
+
 }
+
 
-.problem-section{
-padding:70px 6%;
+/* =====================================================
+   LEADERBOARD
+   ===================================================== */
+
+async function loadLeaderboard(){
+
+const table =
+document.getElementById("leaderboard");
+
+
+const result =
+await db
+.from("user_points")
+.select(
+"points,user_id,profiles(username)"
+)
+.order(
+"points",
+{ascending:false}
+)
+.limit(20);
+
+
+if(result.error){
+
+table.innerHTML =
+'<tr><td>—</td><td>Unable to load</td><td>0</td></tr>';
+
+return;
+
 }
+
 
-.problem-box{
-padding:30px 20px;
+if(!result.data.length){
+
+table.innerHTML =
+'<tr><td>—</td><td>No participants</td><td>0</td></tr>';
+
+return;
+
 }
+
+
+table.innerHTML = "";
+
+
+result.data.forEach(
+(item,index) => {
+
+const row =
+document.createElement("tr");
+
+
+const username =
+item.profiles
+? item.profiles.username
+: "Student";
+
 
-.problem-box h2{
-font-size:40px;
+row.innerHTML =
+
+"<td>" +
+(index + 1) +
+"</td>" +
+
+"<td>" +
+escapeHTML(username) +
+"</td>" +
+
+"<td>" +
+item.points +
+"</td>";
+
+
+table.appendChild(row);
+
+});
+
 }
+
+
+/* =====================================================
+   SECURITY
+   ===================================================== */
+
+function escapeHTML(text){
 
-.world{
-font-size:50px;
+const div =
+document.createElement("div");
+
+div.textContent =
+text || "";
+
+return div.innerHTML;
+
 }
+
+
+/* =====================================================
+   STARTUP
+   ===================================================== */
 
-.auth-buttons{
-flex-direction:column;
+async function startup(){
+
+const result =
+await db.auth.getSession();
+
+if(result.data.session){
+
+await refreshUser();
+
 }
 
 }
+
+
+startup();
