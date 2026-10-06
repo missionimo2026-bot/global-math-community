@@ -1,379 +1,668 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Mission IMO | Young Mathematicians Worldwide</title>
+    <title>Mission IMO | Global Mathematics Community</title>
 
     <meta name="description"
-        content="Mission IMO is a global student-led mathematics and Olympiad community.">
+        content="Mission IMO is a student-led mathematics and Olympiad community.">
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- NAVIGATION -->
+<!-- ================= NAVBAR ================= -->
 
-    <header class="navbar">
+<header class="navbar">
 
-        <div class="logo">
-            🌍 Mission <span>IMO</span>
-        </div>
+    <a href="#home" class="logo">
+        🌍 Mission <span>IMO</span>
+    </a>
 
-        <nav>
-            <a href="#home">Home</a>
-            <a href="#learn">Learn</a>
-            <a href="#problems">Problems</a>
-            <a href="#challenges">Challenges</a>
-            <a href="#about">About</a>
-        </nav>
+    <nav>
+        <a href="#learn">Learn</a>
+        <a href="#problems">Problems</a>
+        <a href="#challenges">Challenges</a>
+        <a href="#community">Community</a>
+        <a href="#about">About</a>
+    </nav>
 
-    </header>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
 
+</header>
 
-    <!-- HERO -->
 
-    <main>
+<!-- ================= HERO ================= -->
 
-        <section id="home" class="hero">
+<main>
 
-            <div class="hero-content">
+<section id="home" class="hero">
 
-                <p class="tag">
-                    🌎 A GLOBAL COMMUNITY FOR YOUNG MATHEMATICIANS
-                </p>
+    <div class="hero-content">
 
-                <h1>
-                    Think.<br>
-                    Solve.<br>
-                    <span>Discover.</span>
-                </h1>
+        <p class="tag">
+            🌎 A GLOBAL COMMUNITY FOR YOUNG MATHEMATICIANS
+        </p>
 
-                <p class="hero-text">
-                    Mission IMO is a student-led community where
-                    young mathematicians from around the world
-                    learn, solve problems and grow together.
-                </p>
+        <h1>
+            Think.<br>
+            Solve.<br>
+            <span>Discover.</span>
+        </h1>
 
-                <div class="buttons">
+        <p class="hero-text">
+            Learn mathematics, solve challenging problems,
+            meet fellow students and grow together.
+        </p>
 
-                    <a href="#learn" class="button primary">
-                        Start Exploring →
-                    </a>
+        <div class="buttons">
 
-                    <a href="#about" class="button secondary">
-                        Our Mission
-                    </a>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- STATS -->
-
-        <section class="stats">
-
-            <div>
-                <strong>🌍</strong>
-                <p>Global</p>
-            </div>
-
-            <div>
-                <strong>🧠</strong>
-                <p>Problem Solving</p>
-            </div>
-
-            <div>
-                <strong>🏆</strong>
-                <p>Olympiad Focus</p>
-            </div>
-
-            <div>
-                <strong>🚀</strong>
-                <p>Student Led</p>
-            </div>
-
-        </section>
-
-
-        <!-- LEARN -->
-
-        <section id="learn" class="section">
-
-            <p class="section-label">01 — LEARN</p>
-
-            <h2>
-                Build your<br>
-                mathematical thinking.
-            </h2>
-
-            <p class="section-description">
-                Mathematics Olympiads aren't only about knowing
-                formulas. They're about learning how to think,
-                experiment and discover.
-            </p>
-
-
-            <div class="cards">
-
-                <article class="card">
-
-                    <div class="icon">📐</div>
-
-                    <h3>Geometry</h3>
-
-                    <p>
-                        Explore shapes, angles, constructions,
-                        proofs and beautiful geometric ideas.
-                    </p>
-
-                    <a href="#">Explore →</a>
-
-                </article>
-
-
-                <article class="card">
-
-                    <div class="icon">🔢</div>
-
-                    <h3>Number Theory</h3>
-
-                    <p>
-                        Discover primes, divisibility,
-                        congruences and surprising patterns.
-                    </p>
-
-                    <a href="#">Explore →</a>
-
-                </article>
-
-
-                <article class="card">
-
-                    <div class="icon">🧮</div>
-
-                    <h3>Combinatorics</h3>
-
-                    <p>
-                        Learn counting, patterns,
-                        arrangements and clever strategies.
-                    </p>
-
-                    <a href="#">Explore →</a>
-
-                </article>
-
-            </div>
-
-        </section>
-
-
-        <!-- PROBLEM -->
-
-        <section id="problems" class="problem-section">
-
-            <div class="problem-box">
-
-                <p class="section-label">02 — PROBLEM OF THE DAY</p>
-
-                <h2>
-                    Can you solve it?
-                </h2>
-
-                <p class="difficulty">
-                    🟢 STARTER
-                </p>
-
-                <div class="problem">
-
-                    <p>
-                        Find the smallest positive integer
-                        that leaves remainder 2 when divided
-                        by 3 and remainder 3 when divided by 5.
-                    </p>
-
-                </div>
-
-                <button class="solve-button"
-                    onclick="showAnswer()">
-                    Reveal Answer
-                </button>
-
-                <p id="answer" class="answer"></p>
-
-            </div>
-
-        </section>
-
-
-        <!-- CHALLENGES -->
-
-        <section id="challenges" class="section">
-
-            <p class="section-label">03 — CHALLENGES</p>
-
-            <h2>
-                Challenge yourself.
-            </h2>
-
-            <p class="section-description">
-                Regular mathematical challenges can help
-                you become faster, more creative and more
-                confident at solving unfamiliar problems.
-            </p>
-
-
-            <div class="challenge-grid">
-
-                <div class="challenge">
-
-                    <span>01</span>
-
-                    <h3>Weekly Problem</h3>
-
-                    <p>
-                        One interesting problem.
-                        One week to find a solution.
-                    </p>
-
-                </div>
-
-
-                <div class="challenge">
-
-                    <span>02</span>
-
-                    <h3>Speed Challenge</h3>
-
-                    <p>
-                        Test your mathematical thinking
-                        against the clock.
-                    </p>
-
-                </div>
-
-
-                <div class="challenge">
-
-                    <span>03</span>
-
-                    <h3>Creative Proof</h3>
-
-                    <p>
-                        Find different ways to explain
-                        the same mathematical idea.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- GLOBAL COMMUNITY -->
-
-        <section class="global">
-
-            <p class="section-label">04 — THE COMMUNITY</p>
-
-            <h2>
-                Mathematics has<br>
-                no borders.
-            </h2>
-
-            <p>
-                Mission IMO aims to bring together students
-                who love mathematics, regardless of where
-                they live.
-            </p>
-
-            <div class="world">
-                🌎 🌍 🌏
-            </div>
-
-            <a href="#about" class="button primary">
-                Join the Mission →
+            <a href="#join" class="button primary">
+                Join Mission IMO →
             </a>
 
-        </section>
+            <a href="#problems" class="button secondary">
+                Solve a Problem
+            </a>
 
-
-        <!-- ABOUT -->
-
-        <section id="about" class="about section">
-
-            <p class="section-label">05 — ABOUT</p>
-
-            <h2>
-                Why Mission IMO?
-            </h2>
-
-            <p>
-                Many students are curious about mathematical
-                Olympiads but don't know where to start.
-            </p>
-
-            <p>
-                Mission IMO aims to create a place where
-                students can discover mathematics, practise
-                problem solving and learn from one another.
-            </p>
-
-            <div class="mission-box">
-
-                <h3>Our goal</h3>
-
-                <p>
-                    Make high-quality mathematical learning
-                    accessible to young students everywhere.
-                </p>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- FOOTER -->
-
-    <footer>
-
-        <div class="footer-logo">
-            🌍 Mission IMO
         </div>
 
+    </div>
+
+</section>
+
+
+<!-- ================= STATS ================= -->
+
+<section class="stats">
+
+    <div>
+        <strong>🌍</strong>
+        <p>Global Vision</p>
+    </div>
+
+    <div>
+        <strong>🧠</strong>
+        <p>Problem Solving</p>
+    </div>
+
+    <div>
+        <strong>🏆</strong>
+        <p>Challenges</p>
+    </div>
+
+    <div>
+        <strong>🚀</strong>
+        <p>Student Led</p>
+    </div>
+
+</section>
+
+
+<!-- ================= LEARN ================= -->
+
+<section id="learn" class="section">
+
+    <p class="section-label">01 — LEARN</p>
+
+    <h2>
+        Build your<br>
+        mathematical thinking.
+    </h2>
+
+    <p class="section-description">
+        Olympiad mathematics isn't only about memorising
+        formulas. It's about thinking creatively and
+        discovering ideas.
+    </p>
+
+    <div class="cards">
+
+        <article class="card">
+
+            <div class="icon">🔢</div>
+
+            <h3>Number Theory</h3>
+
+            <p>
+                Explore primes, divisibility, remainders,
+                congruences and patterns.
+            </p>
+
+            <button onclick="showMessage('Number Theory lessons are coming soon!')">
+                Explore →
+            </button>
+
+        </article>
+
+
+        <article class="card">
+
+            <div class="icon">📐</div>
+
+            <h3>Geometry</h3>
+
+            <p>
+                Learn angles, constructions, proofs
+                and geometric problem solving.
+            </p>
+
+            <button onclick="showMessage('Geometry lessons are coming soon!')">
+                Explore →
+            </button>
+
+        </article>
+
+
+        <article class="card">
+
+            <div class="icon">🧮</div>
+
+            <h3>Combinatorics</h3>
+
+            <p>
+                Discover counting, arrangements,
+                patterns and clever strategies.
+            </p>
+
+            <button onclick="showMessage('Combinatorics lessons are coming soon!')">
+                Explore →
+            </button>
+
+        </article>
+
+    </div>
+
+</section>
+
+
+<!-- ================= PROBLEM ================= -->
+
+<section id="problems" class="problem-section">
+
+    <div class="problem-box">
+
+        <p class="section-label">
+            02 — PROBLEM OF THE DAY
+        </p>
+
+        <h2>Can you solve it?</h2>
+
+        <span class="difficulty">
+            🟢 STARTER
+        </span>
+
+        <div class="problem">
+
+            <p>
+                Find the smallest positive integer that
+                leaves remainder 2 when divided by 3
+                and remainder 3 when divided by 5.
+            </p>
+
+        </div>
+
+        <button class="solve-button" onclick="showAnswer()">
+            Reveal Answer
+        </button>
+
+        <p id="answer" class="answer"></p>
+
+    </div>
+
+</section>
+
+
+<!-- ================= CHALLENGES ================= -->
+
+<section id="challenges" class="section">
+
+    <p class="section-label">03 — CHALLENGES</p>
+
+    <h2>Challenge yourself.</h2>
+
+    <p class="section-description">
+        Take part in mathematical challenges and
+        practise solving unfamiliar problems.
+    </p>
+
+    <div class="challenge-grid">
+
+        <div class="challenge">
+
+            <span>01</span>
+
+            <h3>Weekly Problem</h3>
+
+            <p>
+                One interesting problem.
+                One week to solve it.
+            </p>
+
+            <button onclick="joinChallenge('Weekly Problem')">
+                Join Challenge
+            </button>
+
+        </div>
+
+
+        <div class="challenge">
+
+            <span>02</span>
+
+            <h3>Speed Challenge</h3>
+
+            <p>
+                Test your mathematical thinking
+                against the clock.
+            </p>
+
+            <button onclick="joinChallenge('Speed Challenge')">
+                Join Challenge
+            </button>
+
+        </div>
+
+
+        <div class="challenge">
+
+            <span>03</span>
+
+            <h3>Creative Proof</h3>
+
+            <p>
+                Find different ways to explain
+                mathematical ideas.
+            </p>
+
+            <button onclick="joinChallenge('Creative Proof')">
+                Join Challenge
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= COMMUNITY ================= -->
+
+<section id="community" class="community section">
+
+    <p class="section-label">
+        04 — COMMUNITY
+    </p>
+
+    <h2>
+        Meet young<br>
+        mathematicians.
+    </h2>
+
+    <p class="section-description">
+        A future place for students to share ideas,
+        solutions and mathematical discoveries.
+    </p>
+
+
+    <div class="community-grid">
+
+        <div class="community-card">
+
+            <div class="avatar">🧑‍🎓</div>
+
+            <h3>Student Profiles</h3>
+
+            <p>
+                Introduce yourself and share your
+                mathematical interests.
+            </p>
+
+        </div>
+
+
+        <div class="community-card">
+
+            <div class="avatar">💬</div>
+
+            <h3>Discussions</h3>
+
+            <p>
+                Discuss problems and learn different
+                approaches from other students.
+            </p>
+
+        </div>
+
+
+        <div class="community-card">
+
+            <div class="avatar">🌎</div>
+
+            <h3>Global Network</h3>
+
+            <p>
+                Connect with students interested
+                in mathematics around the world.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= MEMBER DIRECTORY ================= -->
+
+<section class="directory section">
+
+    <p class="section-label">
+        05 — COMMUNITY DIRECTORY
+    </p>
+
+    <h2>Community members</h2>
+
+    <div id="memberList" class="member-list">
+
+        <div class="empty">
+            No members yet.
+            Be the first to join Mission IMO.
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= LEADERBOARD ================= -->
+
+<section class="leaderboard section">
+
+    <p class="section-label">
+        06 — LEADERBOARD
+    </p>
+
+    <h2>Challenge leaderboard</h2>
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+
+            <tbody id="leaderboard">
+
+                <tr>
+                    <td>—</td>
+                    <td>No participants yet</td>
+                    <td>0</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<!-- ================= GLOBAL EVENTS ================= -->
+
+<section class="global">
+
+    <p class="section-label">
+        07 — GLOBAL
+    </p>
+
+    <h2>
+        Mathematics<br>
+        has no borders.
+    </h2>
+
+    <p>
+        The long-term goal is to bring together
+        students who love mathematics from
+        different countries.
+    </p>
+
+    <div class="world">
+        🌎 🌍 🌏
+    </div>
+
+    <button class="button primary"
+        onclick="showMessage('Global events will be announced here.')">
+        Explore Global Events →
+    </button>
+
+</section>
+
+
+<!-- ================= JOIN ================= -->
+
+<section id="join" class="join section">
+
+    <p class="section-label">
+        08 — JOIN
+    </p>
+
+    <h2>Join Mission IMO.</h2>
+
+    <p class="section-description">
+        Tell us a little about yourself.
+    </p>
+
+
+    <form id="joinForm">
+
+        <label>
+            Name
+            <input
+                type="text"
+                id="name"
+                placeholder="Your name"
+                required>
+        </label>
+
+
+        <label>
+            Country
+            <input
+                type="text"
+                id="country"
+                placeholder="Your country"
+                required>
+        </label>
+
+
+        <label>
+            Role
+            <select id="role">
+
+                <option>Student</option>
+                <option>Mentor</option>
+
+            </select>
+        </label>
+
+
+        <label>
+            Mathematics interests
+            <input
+                type="text"
+                id="interest"
+                placeholder="e.g. Number Theory, Geometry">
+        </label>
+
+
+        <label>
+            Short introduction
+            <textarea
+                id="bio"
+                placeholder="Tell the community about yourself"></textarea>
+        </label>
+
+
+        <button type="submit" class="button primary">
+            Join Mission IMO 🚀
+        </button>
+
+    </form>
+
+
+    <p id="joinMessage" class="form-message"></p>
+
+</section>
+
+
+<!-- ================= SUBMIT PROBLEM ================= -->
+
+<section class="submit section">
+
+    <p class="section-label">
+        09 — CONTRIBUTE
+    </p>
+
+    <h2>Have a problem?</h2>
+
+    <p class="section-description">
+        Share a mathematical problem with the community.
+    </p>
+
+
+    <form id="problemForm">
+
+        <label>
+            Problem
+            <textarea
+                id="problemInput"
+                placeholder="Write your problem here..."
+                required></textarea>
+        </label>
+
+
+        <label>
+            Difficulty
+            <select id="problemDifficulty">
+
+                <option>Starter</option>
+                <option>Intermediate</option>
+                <option>Olympiad</option>
+
+            </select>
+        </label>
+
+
+        <button type="submit" class="button primary">
+            Submit Problem
+        </button>
+
+    </form>
+
+    <p id="problemMessage" class="form-message"></p>
+
+</section>
+
+
+<!-- ================= SAFETY ================= -->
+
+<section class="rules section">
+
+    <p class="section-label">
+        10 — COMMUNITY RULES
+    </p>
+
+    <h2>Keep it positive.</h2>
+
+    <div class="rules-box">
+
+        <p>✅ Respect other students.</p>
+
+        <p>✅ Focus on mathematics and learning.</p>
+
+        <p>✅ Give credit for other people's ideas.</p>
+
+        <p>❌ No bullying or harassment.</p>
+
+        <p>❌ Don't share private information.</p>
+
+        <p>❌ Don't impersonate other people.</p>
+
+    </div>
+
+</section>
+
+
+<!-- ================= ABOUT ================= -->
+
+<section id="about" class="about section">
+
+    <p class="section-label">
+        11 — ABOUT
+    </p>
+
+    <h2>Why Mission IMO?</h2>
+
+    <p>
+        Many students are interested in mathematical
+        Olympiads but don't know where to begin.
+    </p>
+
+    <p>
+        Mission IMO aims to create a place where
+        young students can discover mathematics,
+        practise problem solving and learn together.
+    </p>
+
+    <div class="mission-box">
+
+        <h3>Our mission</h3>
+
         <p>
-            Built by students, for students.
+            Make high-quality mathematical learning
+            accessible to young students everywhere.
         </p>
 
-        <p class="copyright">
-            © 2026 Mission IMO
-        </p>
+    </div>
 
-    </footer>
+</section>
 
 
-    <!-- JAVASCRIPT -->
+</main>
 
-    <script>
 
-        function showAnswer() {
+<!-- ================= FOOTER ================= -->
 
-            document.getElementById("answer").innerHTML =
-                "Answer: 8 🎉";
+<footer>
 
-        }
+    <div class="footer-logo">
+        🌍 Mission IMO
+    </div>
 
-    </script>
+    <p>
+        Built by students, for students.
+    </p>
+
+    <p class="copyright">
+        © 2026 Mission IMO
+    </p>
+
+</footer>
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script src="script.js"></script>
 
 </body>
-
-                        </html>
+            </html>
