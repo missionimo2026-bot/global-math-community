@@ -1,758 +1,920 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* =====================================================
+   MISSION IMO V1
+   SUPABASE CONNECTION
+   ===================================================== */
 
-html {
-    scroll-behavior: smooth;
-}
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #070b16;
-    color: white;
-    line-height: 1.6;
-}
+/* =====================================================
+   SUPABASE CONFIG
+   =====================================================
 
-a {
-    text-decoration: none;
-    color: inherit;
-}
+   Replace ONLY these two values.
 
-button,
-input,
-textarea,
-select {
-    font: inherit;
-}
+   Get them from:
+   Supabase → Project Settings → API
 
+   Use the project URL and PUBLIC/PUBLISHABLE key.
 
-/* NAVBAR */
+   NEVER use the service-role/secret key here.
+*/
 
-.navbar {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+const SUPABASE_URL =
+"YOUR_SUPABASE_PROJECT_URL";
 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+const SUPABASE_KEY =
+"YOUR_SUPABASE_PUBLISHABLE_KEY";
 
-    padding: 18px 7%;
 
-    background: rgba(7, 11, 22, 0.96);
+const db =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
-    border-bottom: 1px solid #20283f;
-}
 
-.logo {
-    font-size: 22px;
-    font-weight: bold;
-}
+/* =====================================================
+   MENU
+   ===================================================== */
 
-.logo span {
-    color: #8995ff;
-}
+function toggleMenu(){
 
-nav {
-    display: flex;
-    gap: 22px;
-}
+const nav =
+document.getElementById("nav");
 
-nav a {
-    color: #aeb7d1;
-    font-size: 14px;
+nav.classList.toggle("open");
+
 }
+
+
+/* =====================================================
+   PROBLEM OF THE DAY
+   ===================================================== */
+
+function showAnswer(){
+
+document.getElementById("answer")
+.textContent =
+"Answer: 8 🎉";
 
-nav a:hover {
-    color: white;
 }
 
-.menu-btn {
-    display: none;
 
-    background: none;
-    border: none;
+/* =====================================================
+   AUTH MESSAGE
+   ===================================================== */
 
-    color: white;
-    font-size: 25px;
+function authMessage(message){
+
+document.getElementById("authMessage")
+.textContent = message;
+
 }
 
 
-/* HERO */
+/* =====================================================
+   SIGN UP
+   ===================================================== */
 
-.hero {
-    min-height: 85vh;
+async function signUp(){
 
-    display: flex;
-    align-items: center;
+const email =
+document.getElementById("email").value.trim();
 
-    padding: 80px 8%;
+const password =
+document.getElementById("password").value;
 
-    background:
-        radial-gradient(circle at 75% 30%, #242f70, transparent 35%),
-        #070b16;
-}
+const username =
+document.getElementById("username").value.trim();
 
-.hero-content {
-    max-width: 800px;
-}
+const country =
+document.getElementById("country").value.trim();
 
-.tag,
-.section-label {
-    color: #8995ff;
+const interests =
+document.getElementById("interests").value.trim();
 
-    font-size: 12px;
-    font-weight: bold;
+const bio =
+document.getElementById("bio").value.trim();
 
-    letter-spacing: 2px;
-}
 
-.hero h1 {
-    margin-top: 20px;
+if(!email || !password || !username){
 
-    font-size: clamp(60px, 10vw, 105px);
+authMessage(
+"Please enter email, password and username."
+);
 
-    line-height: 0.93;
-}
+return;
 
-.hero h1 span {
-    color: #8995ff;
 }
+
 
-.hero-text {
-    max-width: 650px;
+if(password.length < 6){
 
-    margin-top: 30px;
+authMessage(
+"Password must be at least 6 characters."
+);
 
-    color: #aeb7d1;
+return;
 
-    font-size: 18px;
 }
 
-.buttons {
-    display: flex;
-    gap: 15px;
 
-    margin-top: 35px;
-}
+authMessage("Creating your account...");
 
-.button {
-    display: inline-block;
 
-    padding: 13px 22px;
+const result =
+await db.auth.signUp({
 
-    border: none;
-    border-radius: 9px;
+email:email,
+password:password
 
-    cursor: pointer;
+});
 
-    font-weight: bold;
-}
 
-.primary {
-    background: white;
-    color: #070b16;
-}
+if(result.error){
+
+authMessage(
+result.error.message
+);
 
-.secondary {
-    border: 1px solid #414b69;
-    color: white;
-    background: transparent;
+return;
+
 }
 
 
-/* STATS */
+const user =
+result.data.user;
 
-.stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
 
-    border-top: 1px solid #20283f;
-    border-bottom: 1px solid #20283f;
-}
+if(!user){
 
-.stats div {
-    padding: 30px;
-    text-align: center;
+authMessage(
+"Account created. Please check your email."
+);
 
-    border-right: 1px solid #20283f;
-}
+return;
 
-.stats strong {
-    font-size: 25px;
 }
 
-.stats p {
-    color: #9da7c3;
-}
 
+/*
+The database trigger creates the profile automatically.
+We then update the profile with the information entered.
+*/
 
-/* SECTIONS */
+const profileUpdate =
+await db
+.from("profiles")
+.update({
 
-.section {
-    padding: 110px 8%;
-}
+username:username,
+country:country,
+interests:interests,
+bio:bio
+
+})
+.eq("id",user.id);
+
+
+if(profileUpdate.error){
 
-.section h2 {
-    margin-top: 15px;
+authMessage(
+"Account created, but profile setup needs another try."
+);
 
-    font-size: clamp(42px, 7vw, 72px);
+return;
 
-    line-height: 1.05;
 }
 
-.section-description {
-    max-width: 650px;
 
-    margin-top: 25px;
+authMessage(
+"Account created successfully! 🚀"
+);
 
-    color: #aeb7d1;
+await refreshUser();
 
-    font-size: 17px;
 }
 
 
-/* CARDS */
+/* =====================================================
+   LOGIN
+   ===================================================== */
 
-.cards {
-    display: grid;
+async function signIn(){
 
-    grid-template-columns: repeat(3, 1fr);
+const email =
+document.getElementById("email").value.trim();
 
-    gap: 20px;
+const password =
+document.getElementById("password").value;
 
-    margin-top: 50px;
+
+if(!email || !password){
+
+authMessage(
+"Enter your email and password."
+);
+
+return;
+
 }
 
-.card,
-.community-card,
-.challenge {
-    padding: 30px;
 
-    background: #10172c;
+authMessage("Logging in...");
 
-    border: 1px solid #242d49;
 
-    border-radius: 15px;
+const result =
+await db.auth.signInWithPassword({
 
-    transition: 0.25s;
-}
+email:email,
+password:password
 
-.card:hover,
-.community-card:hover,
-.challenge:hover {
-    transform: translateY(-6px);
+});
 
-    border-color: #6977e8;
-}
 
-.icon,
-.avatar {
-    font-size: 35px;
-}
+if(result.error){
 
-.card h3,
-.community-card h3 {
-    margin-top: 20px;
+authMessage(
+result.error.message
+);
 
-    font-size: 24px;
+return;
+
 }
+
 
-.card p,
-.community-card p,
-.challenge p {
-    margin-top: 12px;
+authMessage(
+"Welcome back! 🚀"
+);
 
-    color: #9da7c3;
+await refreshUser();
+
 }
 
-.card button,
-.challenge button {
-    margin-top: 22px;
 
-    padding: 10px 16px;
+/* =====================================================
+   LOGOUT
+   ===================================================== */
 
-    border: 1px solid #414b69;
+async function signOut(){
 
-    border-radius: 8px;
+await db.auth.signOut();
 
-    background: transparent;
+document
+.getElementById("authBox")
+.classList.remove("hidden");
 
-    color: white;
+document
+.getElementById("loggedInBox")
+.classList.add("hidden");
 
-    cursor: pointer;
-}
+document
+.getElementById("newPostArea")
+.classList.add("hidden");
 
-.card button:hover,
-.challenge button:hover {
-    background: white;
-    color: #070b16;
+document
+.getElementById("postList")
+.innerHTML =
+'<div class="empty">Login to see community discussions.</div>';
+
 }
+
+
+/* =====================================================
+   CURRENT USER
+   ===================================================== */
 
+async function getUser(){
 
-/* PROBLEM */
+const result =
+await db.auth.getUser();
 
-.problem-section {
-    padding: 100px 8%;
+return result.data.user;
 
-    background: #0d1325;
 }
 
-.problem-box {
-    max-width: 800px;
 
-    margin: auto;
+/* =====================================================
+   REFRESH USER UI
+   ===================================================== */
 
-    padding: 50px;
+async function refreshUser(){
 
-    text-align: center;
+const user =
+await getUser();
 
-    background: #111a34;
 
-    border: 1px solid #293456;
+if(!user){
 
-    border-radius: 20px;
+return;
+
 }
 
-.problem-box h2 {
-    margin-top: 15px;
 
-    font-size: 50px;
-}
+document
+.getElementById("authBox")
+.classList.add("hidden");
 
-.difficulty {
-    display: inline-block;
+document
+.getElementById("loggedInBox")
+.classList.remove("hidden");
 
-    margin-top: 20px;
+document
+.getElementById("newPostArea")
+.classList.remove("hidden");
 
-    padding: 5px 12px;
 
-    border-radius: 20px;
+document
+.getElementById("userInfo")
+.textContent =
+"Logged in as " + user.email;
 
-    background: #162d23;
 
-    color: #6ee7a3;
+await loadMembers();
+await loadPosts();
+await loadLeaderboard();
+await loadChallenges();
 
-    font-size: 12px;
 }
+
+
+/* =====================================================
+   LOAD MEMBERS
+   ===================================================== */
+
+async function loadMembers(){
 
-.problem {
-    margin-top: 30px;
+const container =
+document.getElementById("memberList");
 
-    padding: 25px;
 
-    background: #080d1c;
+const result =
+await db
+.from("profiles")
+.select(
+"username,country,interests,bio"
+)
+.order(
+"created_at",
+{ascending:false}
+);
 
-    border-radius: 12px;
 
-    font-size: 18px;
+if(result.error){
+
+container.innerHTML =
+'<div class="empty">Unable to load community.</div>';
+
+return;
+
 }
 
-.solve-button {
-    margin-top: 25px;
 
-    padding: 12px 22px;
+const members =
+result.data;
 
-    border: none;
-    border-radius: 8px;
 
-    background: white;
+if(!members.length){
 
-    color: #070b16;
+container.innerHTML =
+'<div class="empty">No members yet.</div>';
 
-    font-weight: bold;
+return;
 
-    cursor: pointer;
 }
 
-.answer {
-    margin-top: 20px;
 
-    color: #7ee7a5;
+container.innerHTML = "";
 
-    font-weight: bold;
-}
 
+members.forEach(member => {
 
-/* CHALLENGES */
+const card =
+document.createElement("div");
 
-.challenge-grid {
-    display: grid;
+card.className = "member";
 
-    grid-template-columns: repeat(3, 1fr);
 
-    gap: 20px;
+const username =
+escapeHTML(
+member.username
+);
 
-    margin-top: 50px;
-}
+const country =
+escapeHTML(
+member.country || ""
+);
 
-.challenge span {
-    color: #8995ff;
+const interests =
+escapeHTML(
+member.interests || "Mathematics"
+);
 
-    font-weight: bold;
-}
 
-.challenge h3 {
-    margin-top: 20px;
+card.innerHTML =
 
-    font-size: 25px;
-}
+'<div class="member-avatar">🧑‍🎓</div>' +
 
+'<h3>' +
+username +
+'</h3>' +
 
-/* COMMUNITY */
+'<p>🌍 ' +
+country +
+'</p>' +
 
-.community {
-    background: #0a0f1e;
-}
+'<p>🧠 ' +
+interests +
+'</p>';
 
-.community-grid {
-    display: grid;
 
-    grid-template-columns: repeat(3, 1fr);
+container.appendChild(card);
 
-    gap: 20px;
+});
 
-    margin-top: 50px;
 }
+
+
+/* =====================================================
+   CREATE POST
+   ===================================================== */
 
+async function createPost(){
 
-/* MEMBERS */
+const user =
+await getUser();
 
-.member-list {
-    display: grid;
 
-    grid-template-columns: repeat(3, 1fr);
+if(!user){
 
-    gap: 20px;
+alert("Please login first.");
 
-    margin-top: 45px;
+return;
+
 }
 
-.member {
-    padding: 25px;
 
-    background: #10172c;
+const title =
+document
+.getElementById("postTitle")
+.value
+.trim();
 
-    border: 1px solid #242d49;
+const content =
+document
+.getElementById("postContent")
+.value
+.trim();
 
-    border-radius: 14px;
-}
 
-.member-avatar {
-    font-size: 30px;
-}
+if(!title || !content){
 
-.member h3 {
-    margin-top: 10px;
-}
+alert("Write a title and message.");
+
+return;
 
-.member p {
-    color: #9da7c3;
 }
 
-.empty {
-    padding: 30px;
 
-    color: #9da7c3;
+const result =
+await db
+.from("posts")
+.insert({
 
-    border: 1px dashed #414b69;
+user_id:user.id,
+title:title,
+content:content
 
-    border-radius: 12px;
-}
+});
+
 
+if(result.error){
 
-/* LEADERBOARD */
+alert(result.error.message);
 
-.table-wrapper {
-    overflow-x: auto;
+return;
 
-    margin-top: 45px;
 }
 
-table {
-    width: 100%;
 
-    border-collapse: collapse;
+document
+.getElementById("postTitle")
+.value = "";
 
-    background: #10172c;
-}
+document
+.getElementById("postContent")
+.value = "";
 
-th,
-td {
-    padding: 18px;
 
-    border-bottom: 1px solid #242d49;
+await loadPosts();
 
-    text-align: left;
 }
 
-th {
-    color: #8995ff;
-}
 
+/* =====================================================
+   LOAD POSTS
+   ===================================================== */
 
-/* GLOBAL */
+async function loadPosts(){
 
-.global {
-    padding: 130px 8%;
+const container =
+document.getElementById("postList");
 
-    text-align: center;
 
-    background:
-        radial-gradient(circle, #202b60, transparent 45%),
-        #070b16;
-}
+const result =
+await db
+.from("posts")
+.select(
+"id,title,content,user_id,created_at"
+)
+.order(
+"created_at",
+{ascending:false}
+)
+.limit(50);
 
-.global h2 {
-    margin-top: 15px;
 
-    font-size: clamp(48px, 8vw, 85px);
+if(result.error){
 
-    line-height: 1;
+container.innerHTML =
+'<div class="empty">Unable to load discussions.</div>';
+
+return;
+
 }
 
-.global p {
-    max-width: 650px;
 
-    margin: 25px auto;
+const posts =
+result.data;
 
-    color: #aeb7d1;
-}
+
+if(!posts.length){
+
+container.innerHTML =
+'<div class="empty">No discussions yet. Start the first one!</div>';
 
-.world {
-    margin: 40px 0;
+return;
 
-    font-size: 70px;
 }
 
 
-/* FORMS */
+container.innerHTML = "";
 
-.join,
-.submit {
-    background: #0a0f1e;
-}
 
-form {
-    max-width: 650px;
+posts.forEach(post => {
 
-    margin-top: 40px;
-}
+const card =
+document.createElement("article");
+
+card.className = "post";
+
 
-label {
-    display: block;
+card.innerHTML =
 
-    margin-bottom: 20px;
+'<h3>' +
+escapeHTML(post.title) +
+'</h3>' +
 
-    color: #d9def0;
+'<p>' +
+escapeHTML(post.content) +
+'</p>' +
 
-    font-weight: bold;
+'<button class="button secondary" ' +
+'onclick="reportPost(' +
+post.id +
+')">' +
+"🚩 Report" +
+"</button>";
+
+
+container.appendChild(card);
+
+});
+
 }
 
-input,
-textarea,
-select {
-    display: block;
 
-    width: 100%;
+/* =====================================================
+   REPORT POST
+   ===================================================== */
 
-    margin-top: 8px;
+async function reportPost(postId){
 
-    padding: 14px;
+const user =
+await getUser();
 
-    border: 1px solid #303b5c;
 
-    border-radius: 8px;
+if(!user){
 
-    background: #10172c;
+alert("Please login first.");
 
-    color: white;
+return;
 
-    outline: none;
 }
 
-textarea {
-    min-height: 130px;
 
-    resize: vertical;
-}
+const reason =
+prompt(
+"Why are you reporting this post?"
+);
 
-input:focus,
-textarea:focus,
-select:focus {
-    border-color: #8995ff;
-}
 
-.form-message {
-    margin-top: 20px;
+if(!reason){
 
-    color: #7ee7a5;
+return;
 
-    font-weight: bold;
 }
+
 
+const result =
+await db
+.from("reports")
+.insert({
 
-/* RULES */
+reporter_id:user.id,
+post_id:postId,
+reason:reason
 
-.rules-box {
-    max-width: 700px;
+});
 
-    margin-top: 40px;
 
-    padding: 30px;
+if(result.error){
 
-    background: #10172c;
+alert(result.error.message);
 
-    border-radius: 12px;
+return;
+
 }
 
-.rules-box p {
-    margin: 12px 0;
 
-    color: #c4cbe0;
+alert(
+"Report submitted. Thank you."
+);
+
 }
+
 
+/* =====================================================
+   SUBMIT PROBLEM
+   ===================================================== */
 
-/* ABOUT */
+async function submitProblem(){
 
-.about {
-    max-width: 950px;
+const user =
+await getUser();
 
-    margin: auto;
+
+if(!user){
+
+document
+.getElementById("problemMessage")
+.textContent =
+"Please login before submitting a problem.";
+
+return;
+
 }
+
 
-.about > p:not(.section-label) {
-    margin-top: 20px;
+const problem =
+document
+.getElementById("problemInput")
+.value
+.trim();
 
-    color: #aeb7d1;
 
-    font-size: 18px;
+const difficulty =
+document
+.getElementById("problemDifficulty")
+.value;
+
+
+if(!problem){
+
+document
+.getElementById("problemMessage")
+.textContent =
+"Write a problem first.";
+
+return;
+
 }
+
+
+const result =
+await db
+.from("problems")
+.insert({
+
+user_id:user.id,
+problem:problem,
+difficulty:difficulty
+
+});
 
-.mission-box {
-    margin-top: 40px;
 
-    padding: 30px;
+if(result.error){
 
-    background: #10172c;
+document
+.getElementById("problemMessage")
+.textContent =
+result.error.message;
 
-    border-left: 4px solid #8995ff;
+return;
 
-    border-radius: 10px;
 }
 
-.mission-box p {
-    margin-top: 8px;
 
-    color: #aeb7d1;
+document
+.getElementById("problemInput")
+.value = "";
+
+
+document
+.getElementById("problemMessage")
+.textContent =
+"Problem submitted successfully! 🧩";
+
 }
+
+
+/* =====================================================
+   LOAD CHALLENGES
+   ===================================================== */
 
+async function loadChallenges(){
 
-/* FOOTER */
+const container =
+document.getElementById("challengeList");
 
-footer {
-    padding: 50px 8%;
 
-    border-top: 1px solid #20283f;
+const result =
+await db
+.from("challenges")
+.select("*")
+.order("id");
 
-    color: #8992ad;
+
+if(result.error){
+
+container.innerHTML =
+'<div class="empty">Unable to load challenges.</div>';
+
+return;
+
 }
+
 
-.footer-logo {
-    color: white;
+container.innerHTML = "";
 
-    font-size: 20px;
 
-    font-weight: bold;
+result.data.forEach(challenge => {
+
+const card =
+document.createElement("div");
+
+card.className = "challenge";
+
+
+card.innerHTML =
+
+'<span>🏆</span>' +
+
+'<h3>' +
+escapeHTML(challenge.title) +
+'</h3>' +
+
+'<p>' +
+escapeHTML(
+challenge.description || ""
+) +
+'</p>' +
+
+'<p>⭐ ' +
+challenge.points +
+" points</p>";
+
+
+container.appendChild(card);
+
+});
+
 }
+
+
+/* =====================================================
+   LEADERBOARD
+   ===================================================== */
+
+async function loadLeaderboard(){
+
+const table =
+document.getElementById("leaderboard");
+
+
+const result =
+await db
+.from("user_points")
+.select(
+"points,user_id,profiles(username)"
+)
+.order(
+"points",
+{ascending:false}
+)
+.limit(20);
+
 
-footer p {
-    margin-top: 10px;
+if(result.error){
+
+table.innerHTML =
+'<tr><td>—</td><td>Unable to load</td><td>0</td></tr>';
+
+return;
+
 }
+
+
+if(!result.data.length){
 
-.copyright {
-    font-size: 13px;
+table.innerHTML =
+'<tr><td>—</td><td>No participants</td><td>0</td></tr>';
+
+return;
+
 }
+
+
+table.innerHTML = "";
+
 
+result.data.forEach(
+(item,index) => {
 
-/* MOBILE */
+const row =
+document.createElement("tr");
 
-@media (max-width: 750px) {
 
-    .navbar {
-        flex-wrap: wrap;
-    }
+const username =
+item.profiles
+? item.profiles.username
+: "Student";
 
-    nav {
-        display: none;
 
-        width: 100%;
+row.innerHTML =
 
-        flex-direction: column;
+"<td>" +
+(index + 1) +
+"</td>" +
 
-        padding-top: 15px;
+"<td>" +
+escapeHTML(username) +
+"</td>" +
 
-        text-align: center;
-    }
+"<td>" +
+item.points +
+"</td>";
 
-    nav.open {
-        display: flex;
-    }
 
-    .menu-btn {
-        display: block;
-    }
+table.appendChild(row);
 
-    .hero {
-        padding: 70px 6%;
-    }
+});
 
-    .hero h1 {
-        font-size: 60px;
-    }
+}
+
+
+/* =====================================================
+   SECURITY
+   ===================================================== */
+
+function escapeHTML(text){
+
+const div =
+document.createElement("div");
 
-    .buttons {
-        flex-direction: column;
-    }
+div.textContent =
+text || "";
 
-    .button {
-        text-align: center;
-    }
+return div.innerHTML;
 
-    .stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
+}
+
 
-    .stats div {
-        border-bottom: 1px solid #20283f;
-    }
+/* =====================================================
+   STARTUP
+   ===================================================== */
 
-    .cards,
-    .challenge-grid,
-    .community-grid,
-    .member-list {
-        grid-template-columns: 1fr;
-    }
+async function startup(){
 
-    .section {
-        padding: 80px 6%;
-    }
+const result =
+await db.auth.getSession();
 
-    .problem-section {
-        padding: 70px 6%;
-    }
+if(result.data.session){
 
-    .problem-box {
-        padding: 30px 20px;
-    }
+await refreshUser();
 
-    .problem-box h2 {
-        font-size: 40px;
-    }
+}
 
-    .world {
-        font-size: 50px;
-    }
 }
+
+
+startup();
