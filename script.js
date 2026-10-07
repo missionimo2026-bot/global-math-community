@@ -1,920 +1,1106 @@
-/* =====================================================
-   MISSION IMO V1
-   SUPABASE CONNECTION
-   ===================================================== */
+/* =========================================================
+   MISSION IMO — COMPLETE FIREBASE SCRIPT
+   ========================================================= */
+
+/* =========================================================
+   1. FIREBASE CONFIG
+   =========================================================
+   REPLACE THESE VALUES WITH YOUR REAL FIREBASE CONFIG.
+   Firebase Console → Project Settings → Your apps → Web app
+   ========================================================= */
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCtMvHetBaYOQ2JbuIMjFka4S6H-6VIxc8",
+    authDomain: "mission-imo.firebaseapp.com",
+    projectId: "mission-imo",
+    storageBucket: "mission-imo.firebasestorage.app",
+    messagingSenderId: "926204356108",
+    appId: "G-QWKY6QSTTC"
+};
 
 
-/* =====================================================
-   SUPABASE CONFIG
-   =====================================================
+/* =========================================================
+   2. FIREBASE IMPORTS
+   ========================================================= */
 
-   Replace ONLY these two values.
+import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
-   Get them from:
-   Supabase → Project Settings → API
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    updateProfile
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
-   Use the project URL and PUBLIC/PUBLISHABLE key.
-
-   NEVER use the service-role/secret key here.
-*/
-
-const SUPABASE_URL =
-"https://pizpxdjeccykzjqrccyq.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_OCkcysCFZT8ostIe78wFZQ_McPcgAH_";
-
-
-const db =
-window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    setDoc,
+    getDoc,
+    getDocs,
+    doc,
+    query,
+    orderBy,
+    limit,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
-/* =====================================================
-   MENU
-   ===================================================== */
+/* =========================================================
+   3. START FIREBASE
+   ========================================================= */
 
-function toggleMenu(){
+const app = initializeApp(firebaseConfig);
 
-const nav =
-document.getElementById("nav");
+const auth = getAuth(app);
 
-nav.classList.toggle("open");
+const db = getFirestore(app);
 
+
+/* =========================================================
+   4. GLOBAL USER
+   ========================================================= */
+
+let currentUser = null;
+
+
+/* =========================================================
+   5. HELPER FUNCTIONS
+   ========================================================= */
+
+function $(id) {
+    return document.getElementById(id);
 }
 
 
-/* =====================================================
-   PROBLEM OF THE DAY
-   ===================================================== */
+function getValue(id) {
+    const element = $(id);
 
-function showAnswer(){
-
-document.getElementById("answer")
-.textContent =
-"Answer: 8 🎉";
-
+    return element
+        ? element.value.trim()
+        : "";
 }
 
 
-/* =====================================================
-   AUTH MESSAGE
-   ===================================================== */
-
-function authMessage(message){
-
-document.getElementById("authMessage")
-.textContent = message;
-
+function message(text) {
+    alert(text);
 }
 
 
-/* =====================================================
-   SIGN UP
-   ===================================================== */
+function escapeHTML(value) {
 
-async function signUp(){
+    const div = document.createElement("div");
 
-const email =
-document.getElementById("email").value.trim();
+    div.textContent = value || "";
 
-const password =
-document.getElementById("password").value;
-
-const username =
-document.getElementById("username").value.trim();
-
-const country =
-document.getElementById("country").value.trim();
-
-const interests =
-document.getElementById("interests").value.trim();
-
-const bio =
-document.getElementById("bio").value.trim();
-
-
-if(!email || !password || !username){
-
-authMessage(
-"Please enter email, password and username."
-);
-
-return;
-
+    return div.innerHTML;
 }
 
 
-if(password.length < 6){
+function firebaseError(error) {
 
-authMessage(
-"Password must be at least 6 characters."
-);
+    switch (error.code) {
 
-return;
+        case "auth/email-already-in-use":
+            return "This email is already registered.";
 
+        case "auth/invalid-email":
+            return "Please enter a valid email.";
+
+        case "auth/weak-password":
+            return "Password must contain at least 6 characters.";
+
+        case "auth/invalid-credential":
+            return "Incorrect email or password.";
+
+        case "auth/user-not-found":
+            return "No account found with this email.";
+
+        case "auth/wrong-password":
+            return "Incorrect password.";
+
+        case "auth/too-many-requests":
+            return "Too many attempts. Try again later.";
+
+        default:
+            return error.message || "Something went wrong.";
+    }
 }
 
 
-authMessage("Creating your account...");
+/* =========================================================
+   6. AUTHENTICATION STATE
+   ========================================================= */
 
+onAuthStateChanged(auth, async (user) => {
 
-const result =
-await db.auth.signUp({
+    currentUser = user;
 
-email:email,
-password:password
+    updateAuthUI();
 
+    if (user) {
+
+        await createMissingProfile();
+
+        await loadProfile();
+
+        await loadPosts();
+
+        await loadProblems();
+
+        await loadLeaderboard();
+
+        await loadChallenges();
+    }
 });
 
 
-if(result.error){
+/* =========================================================
+   7. UPDATE LOGIN UI
+   ========================================================= */
 
-authMessage(
-result.error.message
-);
+function updateAuthUI() {
 
-return;
+    document
+        .querySelectorAll(".logged-in-only")
+        .forEach(element => {
 
+            element.style.display =
+                currentUser ? "" : "none";
+        });
+
+
+    document
+        .querySelectorAll(".logged-out-only")
+        .forEach(element => {
+
+            element.style.display =
+                currentUser ? "none" : "";
+        });
+
+
+    const userName = $("userName");
+
+    if (userName && currentUser) {
+
+        userName.textContent =
+            currentUser.displayName ||
+            currentUser.email.split("@")[0];
+    }
 }
 
 
-const user =
-result.data.user;
+/* =========================================================
+   8. SIGN UP
+   ========================================================= */
+
+window.signup = async function () {
+
+    const username =
+        getValue("signupUsername");
+
+    const email =
+        getValue("signupEmail");
+
+    const password =
+        getValue("signupPassword");
 
 
-if(!user){
+    if (!username || !email || !password) {
 
-authMessage(
-"Account created. Please check your email."
-);
+        message("Please fill in all fields.");
 
-return;
+        return;
+    }
 
+
+    if (password.length < 6) {
+
+        message(
+            "Password must be at least 6 characters."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const result =
+            await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+
+
+        const user = result.user;
+
+
+        await updateProfile(user, {
+
+            displayName: username
+
+        });
+
+
+        await setDoc(
+            doc(db, "profiles", user.uid),
+            {
+
+                username: username,
+
+                email: email,
+
+                country: "",
+
+                bio: "",
+
+                points: 0,
+
+                joinedMissionIMO: true,
+
+                createdAt: serverTimestamp()
+            }
+        );
+
+
+        await setDoc(
+            doc(db, "userPoints", user.uid),
+            {
+
+                userId: user.uid,
+
+                username: username,
+
+                points: 0,
+
+                createdAt: serverTimestamp()
+            }
+        );
+
+
+        message(
+            "Welcome to Mission IMO, " +
+            username +
+            "! 🚀"
+        );
+
+
+        const form = $("signupForm");
+
+        if (form) form.reset();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        message(firebaseError(error));
+    }
+};
+
+
+/* =========================================================
+   9. LOGIN
+   ========================================================= */
+
+window.login = async function () {
+
+    const email =
+        getValue("loginEmail");
+
+    const password =
+        getValue("loginPassword");
+
+
+    if (!email || !password) {
+
+        message(
+            "Please enter your email and password."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+
+        message("Welcome back! 🧠");
+
+
+        const form = $("loginForm");
+
+        if (form) form.reset();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        message(firebaseError(error));
+    }
+};
+
+
+/* =========================================================
+   10. LOGOUT
+   ========================================================= */
+
+window.logout = async function () {
+
+    try {
+
+        await signOut(auth);
+
+        message("You have been logged out.");
+
+    } catch (error) {
+
+        console.error(error);
+
+        message("Logout failed.");
+    }
+};
+
+
+/* =========================================================
+   11. CREATE PROFILE IF MISSING
+   ========================================================= */
+
+async function createMissingProfile() {
+
+    if (!currentUser) return;
+
+
+    const profileRef =
+        doc(
+            db,
+            "profiles",
+            currentUser.uid
+        );
+
+
+    const profile =
+        await getDoc(profileRef);
+
+
+    if (!profile.exists()) {
+
+        await setDoc(
+            profileRef,
+            {
+
+                username:
+                    currentUser.displayName ||
+                    currentUser.email.split("@")[0],
+
+                email:
+                    currentUser.email,
+
+                country: "",
+
+                bio: "",
+
+                points: 0,
+
+                joinedMissionIMO: true,
+
+                createdAt:
+                    serverTimestamp()
+            }
+        );
+    }
 }
 
 
-/*
-The database trigger creates the profile automatically.
-We then update the profile with the information entered.
-*/
+/* =========================================================
+   12. LOAD PROFILE
+   ========================================================= */
 
-const profileUpdate =
-await db
-.from("profiles")
-.update({
+async function loadProfile() {
 
-username:username,
-country:country,
-interests:interests,
-bio:bio
-
-})
-.eq("id",user.id);
+    if (!currentUser) return;
 
 
-if(profileUpdate.error){
+    try {
 
-authMessage(
-"Account created, but profile setup needs another try."
-);
+        const profileRef =
+            doc(
+                db,
+                "profiles",
+                currentUser.uid
+            );
 
-return;
 
+        const snapshot =
+            await getDoc(profileRef);
+
+
+        if (!snapshot.exists()) return;
+
+
+        const profile =
+            snapshot.data();
+
+
+        const username =
+            $("profileUsername");
+
+        const country =
+            $("profileCountry");
+
+        const bio =
+            $("profileBio");
+
+
+        if (username)
+            username.value =
+                profile.username || "";
+
+
+        if (country)
+            country.value =
+                profile.country || "";
+
+
+        if (bio)
+            bio.value =
+                profile.bio || "";
+
+
+    } catch (error) {
+
+        console.error(
+            "Profile error:",
+            error
+        );
+    }
 }
 
 
-authMessage(
-"Account created successfully! 🚀"
-);
+/* =========================================================
+   13. SAVE PROFILE
+   ========================================================= */
 
-await refreshUser();
+window.saveProfile = async function () {
 
+    if (!currentUser) {
+
+        message(
+            "Please log in first."
+        );
+
+        return;
+    }
+
+
+    const username =
+        getValue("profileUsername");
+
+    const country =
+        getValue("profileCountry");
+
+    const bio =
+        getValue("profileBio");
+
+
+    if (!username) {
+
+        message(
+            "Username cannot be empty."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        await setDoc(
+            doc(
+                db,
+                "profiles",
+                currentUser.uid
+            ),
+            {
+
+                username,
+
+                country,
+
+                bio,
+
+                email:
+                    currentUser.email,
+
+                updatedAt:
+                    serverTimestamp()
+
+            },
+            {
+                merge: true
+            }
+        );
+
+
+        await updateProfile(
+            currentUser,
+            {
+                displayName: username
+            }
+        );
+
+
+        updateAuthUI();
+
+
+        message(
+            "Profile updated! ✅"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        message(
+            "Could not update your profile."
+        );
+    }
+};
+
+
+/* =========================================================
+   14. CREATE DISCUSSION POST
+   ========================================================= */
+
+window.createPost = async function () {
+
+    if (!currentUser) {
+
+        message(
+            "Please log in before posting."
+        );
+
+        return;
+    }
+
+
+    const title =
+        getValue("postTitle");
+
+    const content =
+        getValue("postContent");
+
+
+    if (!title || !content) {
+
+        message(
+            "Please enter a title and message."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        await addDoc(
+            collection(db, "posts"),
+            {
+
+                title,
+
+                content,
+
+                authorId:
+                    currentUser.uid,
+
+                authorName:
+                    currentUser.displayName ||
+                    currentUser.email.split("@")[0],
+
+                createdAt:
+                    serverTimestamp()
+            }
+        );
+
+
+        message(
+            "Discussion posted! 🎉"
+        );
+
+
+        const form =
+            $("postForm");
+
+        if (form) form.reset();
+
+
+        await loadPosts();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        message(
+            "Could not create the discussion."
+        );
+    }
+};
+
+
+/* =========================================================
+   15. LOAD DISCUSSIONS
+   ========================================================= */
+
+async function loadPosts() {
+
+    const container =
+        $("postsContainer");
+
+
+    if (!container) return;
+
+
+    try {
+
+        const postsQuery =
+            query(
+                collection(db, "posts"),
+                orderBy("createdAt", "desc"),
+                limit(50)
+            );
+
+
+        const snapshot =
+            await getDocs(postsQuery);
+
+
+        container.innerHTML = "";
+
+
+        if (snapshot.empty) {
+
+            container.innerHTML =
+                "<p>No discussions yet.</p>";
+
+            return;
+        }
+
+
+        snapshot.forEach(postDoc => {
+
+            const post =
+                postDoc.data();
+
+
+            const card =
+                document.createElement("article");
+
+
+            card.className =
+                "post-card";
+
+
+            card.innerHTML = `
+
+                <h3>
+                    ${escapeHTML(post.title)}
+                </h3>
+
+                <p>
+                    ${escapeHTML(post.content)}
+                </p>
+
+                <small>
+                    By
+                    ${escapeHTML(
+                        post.authorName || "Student"
+                    )}
+                </small>
+
+            `;
+
+
+            container.appendChild(card);
+        });
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML =
+            "<p>Unable to load discussions.</p>";
+    }
 }
 
 
-/* =====================================================
-   LOGIN
-   ===================================================== */
+/* =========================================================
+   16. SUBMIT PROBLEM
+   ========================================================= */
 
-async function signIn(){
+window.submitProblem = async function () {
 
-const email =
-document.getElementById("email").value.trim();
+    if (!currentUser) {
 
-const password =
-document.getElementById("password").value;
+        message(
+            "Please log in before submitting a problem."
+        );
+
+        return;
+    }
 
 
-if(!email || !password){
+    const title =
+        getValue("problemTitle");
 
-authMessage(
-"Enter your email and password."
-);
+    const statement =
+        getValue("problemStatement");
 
-return;
+    const difficulty =
+        getValue("problemDifficulty");
 
+
+    if (!title || !statement) {
+
+        message(
+            "Please enter the problem title and statement."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        await addDoc(
+            collection(db, "problems"),
+            {
+
+                title,
+
+                statement,
+
+                difficulty:
+                    difficulty || "Unspecified",
+
+                authorId:
+                    currentUser.uid,
+
+                authorName:
+                    currentUser.displayName ||
+                    currentUser.email.split("@")[0],
+
+                createdAt:
+                    serverTimestamp()
+            }
+        );
+
+
+        message(
+            "Problem submitted! 🧠"
+        );
+
+
+        const form =
+            $("problemForm");
+
+        if (form) form.reset();
+
+
+        await loadProblems();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        message(
+            "Could not submit the problem."
+        );
+    }
+};
+
+
+/* =========================================================
+   17. LOAD COMMUNITY PROBLEMS
+   ========================================================= */
+
+async function loadProblems() {
+
+    const container =
+        $("problemsContainer");
+
+
+    if (!container) return;
+
+
+    try {
+
+        const problemsQuery =
+            query(
+                collection(db, "problems"),
+                orderBy("createdAt", "desc"),
+                limit(50)
+            );
+
+
+        const snapshot =
+            await getDocs(problemsQuery);
+
+
+        container.innerHTML = "";
+
+
+        if (snapshot.empty) {
+
+            container.innerHTML =
+                "<p>No community problems yet.</p>";
+
+            return;
+        }
+
+
+        snapshot.forEach(problemDoc => {
+
+            const problem =
+                problemDoc.data();
+
+
+            const card =
+                document.createElement("article");
+
+
+            card.className =
+                "problem-card";
+
+
+            card.innerHTML = `
+
+                <h3>
+                    ${escapeHTML(problem.title)}
+                </h3>
+
+                <p>
+                    ${escapeHTML(problem.statement)}
+                </p>
+
+                <strong>
+                    Difficulty:
+                    ${escapeHTML(
+                        problem.difficulty ||
+                        "Unspecified"
+                    )}
+                </strong>
+
+                <br>
+
+                <small>
+                    Submitted by
+                    ${escapeHTML(
+                        problem.authorName ||
+                        "Student"
+                    )}
+                </small>
+
+            `;
+
+
+            container.appendChild(card);
+        });
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML =
+            "<p>Unable to load problems.</p>";
+    }
 }
 
 
-authMessage("Logging in...");
+/* =========================================================
+   18. LOAD LEADERBOARD
+   ========================================================= */
+
+async function loadLeaderboard() {
+
+    const container =
+        $("leaderboardContainer");
 
 
-const result =
-await db.auth.signInWithPassword({
-
-email:email,
-password:password
-
-});
+    if (!container) return;
 
 
-if(result.error){
+    try {
 
-authMessage(
-result.error.message
-);
+        const leaderboardQuery =
+            query(
+                collection(db, "userPoints"),
+                orderBy("points", "desc"),
+                limit(50)
+            );
 
-return;
 
+        const snapshot =
+            await getDocs(
+                leaderboardQuery
+            );
+
+
+        container.innerHTML = "";
+
+
+        if (snapshot.empty) {
+
+            container.innerHTML =
+                "<p>No leaderboard data yet.</p>";
+
+            return;
+        }
+
+
+        let rank = 1;
+
+
+        snapshot.forEach(userDoc => {
+
+            const user =
+                userDoc.data();
+
+
+            const row =
+                document.createElement("div");
+
+
+            row.className =
+                "leaderboard-row";
+
+
+            row.innerHTML = `
+
+                <span>
+                    #${rank}
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        user.username ||
+                        "Student"
+                    )}
+                </strong>
+
+                <span>
+                    ${Number(
+                        user.points || 0
+                    )}
+                    points
+                </span>
+
+            `;
+
+
+            container.appendChild(row);
+
+
+            rank++;
+        });
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML =
+            "<p>Unable to load leaderboard.</p>";
+    }
 }
 
 
-authMessage(
-"Welcome back! 🚀"
-);
+/* =========================================================
+   19. LOAD CHALLENGES
+   ========================================================= */
 
-await refreshUser();
+async function loadChallenges() {
 
-}
+    const container =
+        $("challengesContainer");
 
 
-/* =====================================================
-   LOGOUT
-   ===================================================== */
+    if (!container) return;
 
-async function signOut(){
 
-await db.auth.signOut();
+    try {
 
-document
-.getElementById("authBox")
-.classList.remove("hidden");
+        const challengeQuery =
+            query(
+                collection(db, "challenges"),
+                limit(20)
+            );
 
-document
-.getElementById("loggedInBox")
-.classList.add("hidden");
 
-document
-.getElementById("newPostArea")
-.classList.add("hidden");
+        const snapshot =
+            await getDocs(
+                challengeQuery
+            );
 
-document
-.getElementById("postList")
-.innerHTML =
-'<div class="empty">Login to see community discussions.</div>';
 
-}
+        container.innerHTML = "";
 
 
-/* =====================================================
-   CURRENT USER
-   ===================================================== */
+        if (snapshot.empty) {
 
-async function getUser(){
+            container.innerHTML =
+                "<p>No challenges available yet.</p>";
 
-const result =
-await db.auth.getUser();
+            return;
+        }
 
-return result.data.user;
 
-}
+        snapshot.forEach(challengeDoc => {
 
+            const challenge =
+                challengeDoc.data();
 
-/* =====================================================
-   REFRESH USER UI
-   ===================================================== */
 
-async function refreshUser(){
+            const card =
+                document.createElement("article");
 
-const user =
-await getUser();
 
+            card.className =
+                "challenge-card";
 
-if(!user){
 
-return;
+            card.innerHTML = `
 
-}
+                <h3>
+                    ${escapeHTML(
+                        challenge.title
+                    )}
+                </h3>
 
+                <p>
+                    ${escapeHTML(
+                        challenge.description
+                    )}
+                </p>
 
-document
-.getElementById("authBox")
-.classList.add("hidden");
-
-document
-.getElementById("loggedInBox")
-.classList.remove("hidden");
-
-document
-.getElementById("newPostArea")
-.classList.remove("hidden");
-
-
-document
-.getElementById("userInfo")
-.textContent =
-"Logged in as " + user.email;
-
-
-await loadMembers();
-await loadPosts();
-await loadLeaderboard();
-await loadChallenges();
-
-}
-
-
-/* =====================================================
-   LOAD MEMBERS
-   ===================================================== */
-
-async function loadMembers(){
-
-const container =
-document.getElementById("memberList");
-
-
-const result =
-await db
-.from("profiles")
-.select(
-"username,country,interests,bio"
-)
-.order(
-"created_at",
-{ascending:false}
-);
-
-
-if(result.error){
-
-container.innerHTML =
-'<div class="empty">Unable to load community.</div>';
-
-return;
-
-}
-
-
-const members =
-result.data;
-
-
-if(!members.length){
-
-container.innerHTML =
-'<div class="empty">No members yet.</div>';
-
-return;
-
-}
-
-
-container.innerHTML = "";
-
-
-members.forEach(member => {
-
-const card =
-document.createElement("div");
-
-card.className = "member";
-
-
-const username =
-escapeHTML(
-member.username
-);
-
-const country =
-escapeHTML(
-member.country || ""
-);
-
-const interests =
-escapeHTML(
-member.interests || "Mathematics"
-);
-
-
-card.innerHTML =
-
-'<div class="member-avatar">🧑‍🎓</div>' +
-
-'<h3>' +
-username +
-'</h3>' +
-
-'<p>🌍 ' +
-country +
-'</p>' +
-
-'<p>🧠 ' +
-interests +
-'</p>';
-
-
-container.appendChild(card);
-
-});
-
-}
-
-
-/* =====================================================
-   CREATE POST
-   ===================================================== */
-
-async function createPost(){
-
-const user =
-await getUser();
-
-
-if(!user){
-
-alert("Please login first.");
-
-return;
-
-}
-
-
-const title =
-document
-.getElementById("postTitle")
-.value
-.trim();
-
-const content =
-document
-.getElementById("postContent")
-.value
-.trim();
-
-
-if(!title || !content){
-
-alert("Write a title and message.");
-
-return;
-
-}
-
-
-const result =
-await db
-.from("posts")
-.insert({
-
-user_id:user.id,
-title:title,
-content:content
-
-});
-
-
-if(result.error){
-
-alert(result.error.message);
-
-return;
-
-}
-
-
-document
-.getElementById("postTitle")
-.value = "";
-
-document
-.getElementById("postContent")
-.value = "";
-
-
-await loadPosts();
-
-}
-
-
-/* =====================================================
-   LOAD POSTS
-   ===================================================== */
-
-async function loadPosts(){
-
-const container =
-document.getElementById("postList");
-
-
-const result =
-await db
-.from("posts")
-.select(
-"id,title,content,user_id,created_at"
-)
-.order(
-"created_at",
-{ascending:false}
-)
-.limit(50);
-
-
-if(result.error){
-
-container.innerHTML =
-'<div class="empty">Unable to load discussions.</div>';
-
-return;
-
-}
-
-
-const posts =
-result.data;
-
-
-if(!posts.length){
-
-container.innerHTML =
-'<div class="empty">No discussions yet. Start the first one!</div>';
-
-return;
-
-}
-
-
-container.innerHTML = "";
-
-
-posts.forEach(post => {
-
-const card =
-document.createElement("article");
-
-card.className = "post";
-
-
-card.innerHTML =
-
-'<h3>' +
-escapeHTML(post.title) +
-'</h3>' +
-
-'<p>' +
-escapeHTML(post.content) +
-'</p>' +
-
-'<button class="button secondary" ' +
-'onclick="reportPost(' +
-post.id +
-')">' +
-"🚩 Report" +
-"</button>";
-
-
-container.appendChild(card);
-
-});
-
-}
-
-
-/* =====================================================
-   REPORT POST
-   ===================================================== */
-
-async function reportPost(postId){
-
-const user =
-await getUser();
-
-
-if(!user){
-
-alert("Please login first.");
-
-return;
-
-}
-
-
-const reason =
-prompt(
-"Why are you reporting this post?"
-);
-
-
-if(!reason){
-
-return;
-
-}
-
-
-const result =
-await db
-.from("reports")
-.insert({
-
-reporter_id:user.id,
-post_id:postId,
-reason:reason
-
-});
-
-
-if(result.error){
-
-alert(result.error.message);
-
-return;
-
-}
-
-
-alert(
-"Report submitted. Thank you."
-);
-
-}
-
-
-/* =====================================================
-   SUBMIT PROBLEM
-   ===================================================== */
-
-async function submitProblem(){
-
-const user =
-await getUser();
-
-
-if(!user){
-
-document
-.getElementById("problemMessage")
-.textContent =
-"Please login before submitting a problem.";
-
-return;
-
-}
-
-
-const problem =
-document
-.getElementById("problemInput")
-.value
-.trim();
-
-
-const difficulty =
-document
-.getElementById("problemDifficulty")
-.value;
-
-
-if(!problem){
-
-document
-.getElementById("problemMessage")
-.textContent =
-"Write a problem first.";
-
-return;
-
-}
-
-
-const result =
-await db
-.from("problems")
-.insert({
-
-user_id:user.id,
-problem:problem,
-difficulty:difficulty
-
-});
-
-
-if(result.error){
-
-document
-.getElementById("problemMessage")
-.textContent =
-result.error.message;
-
-return;
-
-}
-
-
-document
-.getElementById("problemInput")
-.value = "";
-
-
-document
-.getElementById("problemMessage")
-.textContent =
-"Problem submitted successfully! 🧩";
-
-}
-
-
-/* =====================================================
-   LOAD CHALLENGES
-   ===================================================== */
-
-async function loadChallenges(){
-
-const container =
-document.getElementById("challengeList");
-
-
-const result =
-await db
-.from("challenges")
-.select("*")
-.order("id");
-
-
-if(result.error){
-
-container.innerHTML =
-'<div class="empty">Unable to load challenges.</div>';
-
-return;
-
-}
-
-
-container.innerHTML = "";
-
-
-result.data.forEach(challenge => {
-
-const card =
-document.createElement("div");
-
-card.className = "challenge";
-
-
-card.innerHTML =
-
-'<span>🏆</span>' +
-
-'<h3>' +
-escapeHTML(challenge.title) +
-'</h3>' +
-
-'<p>' +
-escapeHTML(
-challenge.description || ""
-) +
-'</p>' +
-
-'<p>⭐ ' +
-challenge.points +
-" points</p>";
-
-
-container.appendChild(card);
-
-});
-
-}
-
-
-/* =====================================================
-   LEADERBOARD
-   ===================================================== */
-
-async function loadLeaderboard(){
-
-const table =
-document.getElementById("leaderboard");
-
-
-const result =
-await db
-.from("user_points")
-.select(
-"points,user_id,profiles(username)"
-)
-.order(
-"points",
-{ascending:false}
-)
-.limit(20);
-
-
-if(result.error){
-
-table.innerHTML =
-'<tr><td>—</td><td>Unable to load</td><td>0</td></tr>';
-
-return;
-
-}
-
-
-if(!result.data.length){
-
-table.innerHTML =
-'<tr><td>—</td><td>No participants</td><td>0</td></tr>';
-
-return;
-
-}
-
-
-table.innerHTML = "";
-
-
-result.data.forEach(
-(item,index) => {
-
-const row =
-document.createElement("tr");
-
-
-const username =
-item.profiles
-? item.profiles.username
-: "Student";
-
-
-row.innerHTML =
-
-"<td>" +
-(index + 1) +
-"</td>" +
-
-"<td>" +
-escapeHTML(username) +
-"</td>" +
-
-"<td>" +
-item.points +
-"</td>";
-
-
-table.appendChild(row);
-
-});
-
-}
-
-
-/* =====================================================
-   SECURITY
-   ===================================================== */
-
-function escapeHTML(text){
-
-const div =
-document.createElement("div");
-
-div.textContent =
-text || "";
-
-return div.innerHTML;
-
-}
-
-
-/* =====================================================
-   STARTUP
-   ===================================================== */
-
-async function startup(){
-
-const result =
-await db.auth.getSession();
-
-if(result.data.session){
-
-await refreshUser();
-
-}
-
-}
-
-
-startup();
+                <strong>
+                    ${Number(
+                        challenge.poin
