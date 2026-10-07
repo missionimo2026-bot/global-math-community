@@ -11,14 +11,14 @@
 
     <meta
         name="description"
-        content="Mission IMO — a student-led international mathematics olympiad community."
+        content="Mission IMO — A global student-led mathematics olympiad community."
     >
 
-    <title>Mission IMO — Think. Solve. Discover.</title>
+    <title>Mission IMO | Global Math Community</title>
 
     <link
         rel="stylesheet"
-        href="style.css"
+        href="./style.css"
     >
 </head>
 
@@ -37,21 +37,24 @@
             href="#home"
             class="logo"
         >
-            <span class="logo-symbol">∑</span>
-            Mission IMO
+            Mission <span>IMO</span>
         </a>
 
 
         <button
             id="menuButton"
             class="menu-button"
+            type="button"
             aria-label="Open menu"
         >
             ☰
         </button>
 
 
-        <nav id="navMenu">
+        <nav
+            id="navMenu"
+            class="nav-menu"
+        >
 
             <a href="#home">Home</a>
 
@@ -79,12 +82,11 @@
 </header>
 
 
-<main>
-
-
 <!-- =====================================================
      HERO
 ===================================================== -->
+
+<main>
 
 <section
     id="home"
@@ -93,23 +95,19 @@
 
     <div class="hero-content">
 
-        <div class="badge">
-            🌎 Student-Led Mathematics Community
-        </div>
-
+        <p class="eyebrow">
+            GLOBAL STUDENT-LED MATH COMMUNITY
+        </p>
 
         <h1>
-            Think.
-            <span>Solve.</span>
-            Discover.
+            Think.<br>
+            Solve.<br>
+            <span>Discover.</span>
         </h1>
 
-
-        <p>
-            Mission IMO is a global student-led community
-            for mathematics olympiad enthusiasts.
-            Learn, solve problems, share ideas and grow
-            together.
+        <p class="hero-text">
+            A community for students who love mathematics,
+            olympiads, problem solving and discovering new ideas.
         </p>
 
 
@@ -117,15 +115,14 @@
 
             <a
                 href="#auth"
-                class="button primary-button"
+                class="btn btn-primary"
             >
                 Join Mission IMO
             </a>
 
-
             <a
                 href="#problems"
-                class="button secondary-button"
+                class="btn btn-secondary"
             >
                 Explore Problems
             </a>
@@ -135,14 +132,22 @@
     </div>
 
 
-    <div class="hero-math">
+    <div class="hero-card">
 
-        <div class="math-card">
-            <span>∀</span>
-            <span>∑</span>
-            <span>π</span>
-            <span>∞</span>
-            <span>√</span>
+        <div class="math-symbol">
+            ∑
+        </div>
+
+        <div class="floating-equation">
+            a² + b² = c²
+        </div>
+
+        <div class="floating-equation second">
+            n → ∞
+        </div>
+
+        <div class="floating-equation third">
+            ∫ f(x) dx
         </div>
 
     </div>
@@ -158,27 +163,71 @@
 
     <div class="stats-grid">
 
-        <div class="stat">
-            <strong>🌎</strong>
-            <span>Global Vision</span>
+        <div class="stat-card">
+
+            <strong>
+                🌎
+            </strong>
+
+            <h3>
+                Global Vision
+            </h3>
+
+            <p>
+                Connect with students around the world.
+            </p>
+
         </div>
 
 
-        <div class="stat">
-            <strong>🧠</strong>
-            <span>Problem Solving</span>
+        <div class="stat-card">
+
+            <strong>
+                🧠
+            </strong>
+
+            <h3>
+                Problem Solving
+            </h3>
+
+            <p>
+                Learn mathematics through challenging problems.
+            </p>
+
         </div>
 
 
-        <div class="stat">
-            <strong>🏆</strong>
-            <span>Challenges</span>
+        <div class="stat-card">
+
+            <strong>
+                🏆
+            </strong>
+
+            <h3>
+                Challenges
+            </h3>
+
+            <p>
+                Test your skills and compete with others.
+            </p>
+
         </div>
 
 
-        <div class="stat">
-            <strong>👨‍🎓</strong>
-            <span>Student Led</span>
+        <div class="stat-card">
+
+            <strong>
+                🚀
+            </strong>
+
+            <h3>
+                Student Led
+            </h3>
+
+            <p>
+                Built by students, for students.
+            </p>
+
         </div>
 
     </div>
@@ -197,25 +246,24 @@
 
     <div class="section-heading">
 
-        <span class="section-label">
+        <p class="eyebrow">
             LEARN
-        </span>
+        </p>
 
         <h2>
             Build your mathematical foundation.
         </h2>
 
         <p>
-            Master the core areas that appear again and
-            again in olympiad mathematics.
+            Explore important areas of olympiad mathematics.
         </p>
 
     </div>
 
 
-    <div class="cards-grid">
+    <div class="card-grid">
 
-        <article class="feature-card">
+        <article class="topic-card">
 
             <div class="card-icon">
                 🔢
@@ -226,18 +274,14 @@
             </h3>
 
             <p>
-                Divisibility, primes, modular arithmetic,
-                Diophantine equations and more.
+                Divisibility, primes, remainders,
+                modular arithmetic and more.
             </p>
-
-            <a href="#problems">
-                Explore →
-            </a>
 
         </article>
 
 
-        <article class="feature-card">
+        <article class="topic-card">
 
             <div class="card-icon">
                 📐
@@ -248,18 +292,14 @@
             </h3>
 
             <p>
-                Angles, triangles, circles, transformations
-                and powerful geometric ideas.
+                Angles, triangles, circles,
+                constructions and proofs.
             </p>
-
-            <a href="#problems">
-                Explore →
-            </a>
 
         </article>
 
 
-        <article class="feature-card">
+        <article class="topic-card">
 
             <div class="card-icon">
                 🧩
@@ -270,21 +310,17 @@
             </h3>
 
             <p>
-                Counting, arrangements, patterns, graphs
-                and creative problem solving.
+                Counting, arrangements,
+                patterns and clever strategies.
             </p>
-
-            <a href="#problems">
-                Explore →
-            </a>
 
         </article>
 
 
-        <article class="feature-card">
+        <article class="topic-card">
 
             <div class="card-icon">
-                📊
+                ✏️
             </div>
 
             <h3>
@@ -292,13 +328,9 @@
             </h3>
 
             <p>
-                Equations, identities, inequalities,
-                polynomials and algebraic techniques.
+                Equations, identities,
+                inequalities and algebraic reasoning.
             </p>
-
-            <a href="#problems">
-                Explore →
-            </a>
 
         </article>
 
@@ -311,45 +343,61 @@
      PROBLEM OF THE DAY
 ===================================================== -->
 
-<section class="problem-day-section">
+<section
+    id="daily-problem"
+    class="section dark-section"
+>
 
-    <div class="problem-day">
+    <div class="section-heading">
 
-        <div>
+        <p class="eyebrow">
+            PROBLEM OF THE DAY
+        </p>
 
-            <span class="section-label">
-                PROBLEM OF THE DAY
-            </span>
+        <h2>
+            Can you solve this?
+        </h2>
 
-            <h2>
-                Can you solve it?
-            </h2>
-
-            <p class="big-problem">
-                Find the smallest positive integer
-                that leaves remainder 2 when divided by 3
-                and remainder 3 when divided by 5.
-            </p>
-
-        </div>
+    </div>
 
 
-        <div class="answer-box">
+    <div class="daily-problem-card">
 
-            <button
-                class="button primary-button"
-                onclick="showAnswer()"
-            >
-                Reveal Answer
-            </button>
+        <span class="difficulty">
+            EASY
+        </span>
+
+        <h3>
+            Remainder Challenge
+        </h3>
+
+        <p>
+            Find the smallest positive integer that leaves
+            remainder 2 when divided by 3 and remainder 3
+            when divided by 5.
+        </p>
 
 
-            <p
-                id="problemAnswer"
-                style="display:none;"
-            >
-                <strong>Answer: 8</strong>
-                <br>
+        <button
+            type="button"
+            class="btn btn-primary"
+            onclick="showAnswer()"
+        >
+            Reveal Answer
+        </button>
+
+
+        <div
+            id="problemAnswer"
+            class="answer"
+            style="display:none;"
+        >
+
+            <strong>
+                Answer: 8
+            </strong>
+
+            <p>
                 8 ÷ 3 leaves remainder 2,
                 and 8 ÷ 5 leaves remainder 3.
             </p>
@@ -372,17 +420,16 @@
 
     <div class="section-heading">
 
-        <span class="section-label">
-            PROBLEMS
-        </span>
+        <p class="eyebrow">
+            COMMUNITY PROBLEMS
+        </p>
 
         <h2>
-            Solve. Create. Share.
+            Problems created by students.
         </h2>
 
         <p>
-            Explore problems submitted by students
-            from the Mission IMO community.
+            Share interesting problems with the Mission IMO community.
         </p>
 
     </div>
@@ -393,27 +440,21 @@
         class="content-grid"
     >
 
-        <div class="empty-card">
+        <p>
             Problems will appear here.
-            Create an account to submit one.
-        </div>
+        </p>
 
     </div>
 
 
     <div
         class="form-card logged-in-only"
+        style="display:none;"
     >
 
         <h3>
             Submit a Problem
         </h3>
-
-        <p>
-            Have an interesting olympiad problem?
-            Share it with the community.
-        </p>
-
 
         <form
             id="problemForm"
@@ -425,15 +466,13 @@
                 type="text"
                 placeholder="Problem title"
                 maxlength="150"
-                required
             >
 
 
             <textarea
                 id="problemStatement"
-                placeholder="Write the problem..."
+                placeholder="Write your problem..."
                 rows="6"
-                required
             ></textarea>
 
 
@@ -443,20 +482,20 @@
                     Select difficulty
                 </option>
 
-                <option value="Beginner">
-                    Beginner
+                <option value="Easy">
+                    Easy
                 </option>
 
-                <option value="Intermediate">
-                    Intermediate
+                <option value="Medium">
+                    Medium
+                </option>
+
+                <option value="Hard">
+                    Hard
                 </option>
 
                 <option value="Olympiad">
                     Olympiad
-                </option>
-
-                <option value="Advanced">
-                    Advanced
                 </option>
 
             </select>
@@ -464,7 +503,7 @@
 
             <button
                 type="submit"
-                class="button primary-button"
+                class="btn btn-primary"
             >
                 Submit Problem
             </button>
@@ -487,17 +526,16 @@
 
     <div class="section-heading">
 
-        <span class="section-label">
+        <p class="eyebrow">
             CHALLENGES
-        </span>
+        </p>
 
         <h2>
-            Challenge yourself.
+            Push your limits.
         </h2>
 
         <p>
-            Push your mathematical thinking beyond
-            ordinary practice.
+            Take part in mathematical challenges.
         </p>
 
     </div>
@@ -505,59 +543,68 @@
 
     <div
         id="challengesContainer"
-        class="cards-grid"
+        class="card-grid"
     >
 
-        <div class="empty-card">
-            Challenges will appear here.
-        </div>
-
-    </div>
-
-
-    <div class="challenge-ideas">
-
-        <article>
-
-            <span>⚡</span>
+        <article class="challenge-card">
 
             <h3>
                 Weekly Problem
             </h3>
 
             <p>
-                One challenging problem every week.
+                A challenging problem every week.
             </p>
+
+            <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="startChallenge('Weekly Problem')"
+            >
+                Start
+            </button>
 
         </article>
 
 
-        <article>
-
-            <span>⏱️</span>
+        <article class="challenge-card">
 
             <h3>
                 Speed Challenge
             </h3>
 
             <p>
-                Solve accurately under time pressure.
+                Solve mathematical problems against the clock.
             </p>
+
+            <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="startChallenge('Speed Challenge')"
+            >
+                Start
+            </button>
 
         </article>
 
 
-        <article>
-
-            <span>✍️</span>
+        <article class="challenge-card">
 
             <h3>
                 Creative Proof
             </h3>
 
             <p>
-                Find an elegant way to explain your solution.
+                Find an elegant way to prove a mathematical result.
             </p>
+
+            <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="startChallenge('Creative Proof')"
+            >
+                Start
+            </button>
 
         </article>
 
@@ -577,25 +624,24 @@
 
     <div class="section-heading">
 
-        <span class="section-label">
+        <p class="eyebrow">
             COMMUNITY
-        </span>
+        </p>
 
         <h2>
-            Mathematics has no borders.
+            Learn together.
         </h2>
 
         <p>
-            Connect with students who love mathematics
-            from around the world.
+            Meet students who are passionate about mathematics.
         </p>
 
     </div>
 
 
-    <div class="community-grid">
+    <div class="card-grid">
 
-        <article class="community-card">
+        <article class="topic-card">
 
             <div class="card-icon">
                 👤
@@ -606,14 +652,14 @@
             </h3>
 
             <p>
-                Create your own mathematical profile
-                using a username.
+                Create your own mathematics profile
+                and share your interests.
             </p>
 
         </article>
 
 
-        <article class="community-card">
+        <article class="topic-card">
 
             <div class="card-icon">
                 💬
@@ -624,14 +670,14 @@
             </h3>
 
             <p>
-                Discuss solutions, strategies and
-                mathematical ideas.
+                Talk about problems, strategies,
+                olympiads and mathematics.
             </p>
 
         </article>
 
 
-        <article class="community-card">
+        <article class="topic-card">
 
             <div class="card-icon">
                 🌍
@@ -642,8 +688,7 @@
             </h3>
 
             <p>
-                Meet other young mathematics enthusiasts
-                from different countries.
+                Connect with students from different countries.
             </p>
 
         </article>
@@ -651,17 +696,15 @@
     </div>
 
 
-    <!-- POSTS -->
+<!-- =====================================================
+     DISCUSSIONS
+===================================================== -->
 
-    <div class="community-posts">
+    <div class="subsection">
 
-        <div class="section-mini-heading">
-
-            <h3>
-                Latest Discussions
-            </h3>
-
-        </div>
+        <h3>
+            Community Discussions
+        </h3>
 
 
         <div
@@ -669,14 +712,17 @@
             class="content-grid"
         >
 
-            <div class="empty-card">
+            <p>
                 No discussions yet.
-            </div>
+            </p>
 
         </div>
 
 
-        <div class="form-card logged-in-only">
+        <div
+            class="form-card logged-in-only"
+            style="display:none;"
+        >
 
             <h3>
                 Start a Discussion
@@ -693,22 +739,19 @@
                     type="text"
                     placeholder="Discussion title"
                     maxlength="150"
-                    required
                 >
 
 
                 <textarea
                     id="postContent"
-                    rows="5"
                     placeholder="What do you want to discuss?"
-                    maxlength="5000"
-                    required
+                    rows="5"
                 ></textarea>
 
 
                 <button
-                    class="button primary-button"
                     type="submit"
+                    class="btn btn-primary"
                 >
                     Post Discussion
                 </button>
@@ -719,57 +762,27 @@
 
     </div>
 
-</section>
-
 
 <!-- =====================================================
      LEADERBOARD
 ===================================================== -->
 
-<section class="section leaderboard-section">
+    <div class="subsection">
 
-    <div class="section-heading">
-
-        <span class="section-label">
-            LEADERBOARD
-        </span>
-
-        <h2>
-            Rise through the ranks.
-        </h2>
-
-        <p>
-            Earn points through future Mission IMO
-            challenges and activities.
-        </p>
-
-    </div>
+        <h3>
+            Leaderboard
+        </h3>
 
 
-    <div
-        id="leaderboardContainer"
-        class="leaderboard"
-    >
+        <div
+            id="leaderboardContainer"
+            class="leaderboard"
+        >
 
-        <div class="leaderboard-header">
+            <p>
+                No leaderboard data yet.
+            </p>
 
-            <span>
-                Rank
-            </span>
-
-            <span>
-                Student
-            </span>
-
-            <span>
-                Points
-            </span>
-
-        </div>
-
-
-        <div class="empty-card">
-            No leaderboard data yet.
         </div>
 
     </div>
@@ -778,26 +791,27 @@
 
 
 <!-- =====================================================
-     AUTH
+     AUTHENTICATION
 ===================================================== -->
 
 <section
     id="auth"
-    class="section auth-section"
+    class="section dark-section"
 >
 
     <div class="section-heading">
 
-        <span class="section-label">
-            JOIN
-        </span>
+        <p class="eyebrow">
+            JOIN THE COMMUNITY
+        </p>
 
         <h2>
-            Become part of Mission IMO.
+            Create your Mission IMO account.
         </h2>
 
         <p>
-            Create an account and join the community.
+            Your account lets you create a profile,
+            join discussions and submit problems.
         </p>
 
     </div>
@@ -805,17 +819,16 @@
 
     <div class="auth-grid">
 
+
         <!-- SIGN UP -->
 
-        <div class="auth-card logged-out-only">
+        <div
+            class="form-card logged-out-only"
+        >
 
             <h3>
                 Create Account
             </h3>
-
-            <p>
-                Start your Mission IMO journey.
-            </p>
 
 
             <form
@@ -823,35 +836,53 @@
                 onsubmit="event.preventDefault(); signup();"
             >
 
+                <label
+                    for="signupUsername"
+                >
+                    Username
+                </label>
+
                 <input
                     id="signupUsername"
                     type="text"
-                    placeholder="Username"
+                    placeholder="Choose a username"
                     maxlength="30"
-                    required
+                    autocomplete="username"
                 >
 
+
+                <label
+                    for="signupEmail"
+                >
+                    Email
+                </label>
 
                 <input
                     id="signupEmail"
                     type="email"
-                    placeholder="Email"
-                    required
+                    placeholder="Your email"
+                    autocomplete="email"
                 >
 
+
+                <label
+                    for="signupPassword"
+                >
+                    Password
+                </label>
 
                 <input
                     id="signupPassword"
                     type="password"
-                    placeholder="Password (6+ characters)"
+                    placeholder="At least 6 characters"
                     minlength="6"
-                    required
+                    autocomplete="new-password"
                 >
 
 
                 <button
-                    class="button primary-button full-button"
                     type="submit"
+                    class="btn btn-primary"
                 >
                     Create Account
                 </button>
@@ -863,15 +894,13 @@
 
         <!-- LOGIN -->
 
-        <div class="auth-card logged-out-only">
+        <div
+            class="form-card logged-out-only"
+        >
 
             <h3>
                 Login
             </h3>
-
-            <p>
-                Continue your Mission IMO journey.
-            </p>
 
 
             <form
@@ -879,25 +908,37 @@
                 onsubmit="event.preventDefault(); login();"
             >
 
+                <label
+                    for="loginEmail"
+                >
+                    Email
+                </label>
+
                 <input
                     id="loginEmail"
                     type="email"
-                    placeholder="Email"
-                    required
+                    placeholder="Your email"
+                    autocomplete="email"
                 >
 
+
+                <label
+                    for="loginPassword"
+                >
+                    Password
+                </label>
 
                 <input
                     id="loginPassword"
                     type="password"
-                    placeholder="Password"
-                    required
+                    placeholder="Your password"
+                    autocomplete="current-password"
                 >
 
 
                 <button
-                    class="button primary-button full-button"
                     type="submit"
+                    class="btn btn-primary"
                 >
                     Login
                 </button>
@@ -907,32 +948,125 @@
         </div>
 
 
-        <!-- LOGGED IN -->
+    </div>
 
-        <div
-            class="auth-card logged-in-only account-card"
-        >
 
-            <div class="account-icon">
-                🧠
-            </div>
+    <!-- LOGGED IN -->
+
+    <div
+        class="profile-area logged-in-only"
+        style="display:none;"
+    >
+
+        <div class="form-card">
 
             <h3>
                 Welcome,
-                <span id="userName">
-                    Student
-                </span>
+                <span id="userName"></span> 👋
+            </h3>
+
+
+            <p>
+                You are logged in to Mission IMO.
+            </p>
+
+
+            <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+        </div>
+
+
+        <!-- PROFILE -->
+
+        <div class="form-card">
+
+            <h3>
+                Your Profile
+            </h3>
+
+
+            <form
+                onsubmit="event.preventDefault(); saveProfile();"
+            >
+
+                <label
+                    for="profileUsername"
+                >
+                    Username
+                </label>
+
+                <input
+                    id="profileUsername"
+                    type="text"
+                    maxlength="30"
+                >
+
+
+                <label
+                    for="profileCountry"
+                >
+                    Country
+                </label>
+
+                <input
+                    id="profileCountry"
+                    type="text"
+                    placeholder="Optional"
+                    maxlength="50"
+                >
+
+
+                <label
+                    for="profileBio"
+                >
+                    Bio
+                </label>
+
+                <textarea
+                    id="profileBio"
+                    rows="5"
+                    placeholder="Tell the community about your mathematical interests."
+                    maxlength="300"
+                ></textarea>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Save Profile
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- JOIN -->
+
+        <div class="form-card">
+
+            <h3>
+                Mission IMO
             </h3>
 
             <p>
-                You're part of Mission IMO.
+                Become part of the student-led Mission IMO community.
             </p>
 
+
             <button
-                onclick="logout()"
-                class="button secondary-button"
+                type="button"
+                class="btn btn-primary"
+                onclick="joinMission()"
             >
-                Logout
+                Join Mission IMO
             </button>
 
         </div>
@@ -943,130 +1077,5 @@
 
 
 <!-- =====================================================
-     PROFILE
-===================================================== -->
-
-<section class="section profile-section">
-
-    <div class="section-heading">
-
-        <span class="section-label">
-            PROFILE
-        </span>
-
-        <h2>
-            Your mathematical identity.
-        </h2>
-
-        <p>
-            Use a username instead of sharing personal
-            information publicly.
-        </p>
-
-    </div>
-
-
-    <div class="form-card logged-in-only">
-
-        <form
-            id="profileForm"
-            onsubmit="event.preventDefault(); saveProfile();"
-        >
-
-            <label>
-                Username
-            </label>
-
-            <input
-                id="profileUsername"
-                type="text"
-                maxlength="30"
-                required
-            >
-
-
-            <label>
-                Country
-            </label>
-
-            <input
-                id="profileCountry"
-                type="text"
-                maxlength="50"
-                placeholder="Optional"
-            >
-
-
-            <label>
-                Bio
-            </label>
-
-            <textarea
-                id="profileBio"
-                rows="5"
-                maxlength="500"
-                placeholder="Tell the community about your mathematical interests."
-            ></textarea>
-
-
-            <button
-                class="button primary-button"
-                type="submit"
-            >
-                Save Profile
-            </button>
-
-        </form>
-
-    </div>
-
-
-    <div class="privacy-note">
-
-        🔒 <strong>Privacy:</strong>
-        Never share your phone number, home address,
-        school address or other private information
-        on your public profile.
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     JOIN FORM
-===================================================== -->
-
-<section class="join-section">
-
-    <div class="join-content">
-
-        <span class="section-label">
-            MISSION IMO
-        </span>
-
-        <h2>
-            Ready to solve something bigger?
-        </h2>
-
-        <p>
-            Join a community built by students,
-            for students who love mathematics.
-        </p>
-
-
-        <div class="form-card join-card logged-in-only">
-
-            <form
-                id="joinForm"
-                onsubmit="event.preventDefault(); joinMissionIMO();"
-            >
-
-                <input
-                    id="joinCountry"
-                    type="text"
-                    placeholder="
-
-                    <script type="module" src="./script.js"></script>
-</body>
-            </html>
+     COMMUNITY RULES
+==================================
