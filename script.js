@@ -1,11 +1,10 @@
-  
-/*====================================================
-   MISSION IMO — COMPLETE FIREBASE SCRIPT
+/* =========================================================
+   MISSION IMO — COMPLETE JAVASCRIPT
    ========================================================= */
 
-/* =========================================================
-   1. FIREBASE CONFIG
-   ========================================================= */
+/* =========================
+   FIREBASE CONFIG
+========================= */
 
 const firebaseConfig = {
     apiKey: "AIzaSyCtMvHetBaYO2QJbuIMjFka4S6H-6VIxc8",
@@ -17,12 +16,13 @@ const firebaseConfig = {
 };
 
 
-/* =========================================================
-   2. FIREBASE IMPORTS
-   ========================================================= */
+/* =========================
+   FIREBASE IMPORTS
+========================= */
 
-import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
 import {
     getAuth,
@@ -48,115 +48,98 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
-/* =========================================================
-   3. START FIREBASE
-   ========================================================= */
+/* =========================
+   START FIREBASE
+========================= */
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
 const db = getFirestore(app);
-
-
-/* =========================================================
-   4. GLOBAL USER
-   ========================================================= */
 
 let currentUser = null;
 
 
-/* =========================================================
-   5. HELPER FUNCTIONS
-   ========================================================= */
+/* =========================
+   BASIC HELPERS
+========================= */
 
 function $(id) {
     return document.getElementById(id);
 }
 
-
-function getValue(id) {
-
+function value(id) {
     const element = $(id);
-
-    if (!element) {
-        return "";
-    }
-
-    return element.value.trim();
+    return element ? element.value.trim() : "";
 }
 
-
-function message(text) {
+function notify(text) {
     alert(text);
 }
 
-
-function escapeHTML(value) {
-
+function escapeHTML(text) {
     const div = document.createElement("div");
-
-    div.textContent = value || "";
-
+    div.textContent = text ?? "";
     return div.innerHTML;
 }
 
 
-/* =========================================================
-   6. FIREBASE ERROR HANDLER
-   ========================================================= */
+/* =========================
+   FIREBASE ERROR
+========================= */
 
 function firebaseError(error) {
 
     console.error("Firebase error:", error);
 
-    switch (error.code) {
+    const code = error?.code || "";
 
-        case "auth/email-already-in-use":
-            return "This email is already registered.";
-
-        case "auth/invalid-email":
-            return "Please enter a valid email address.";
-
-        case "auth/weak-password":
-            return "Password must contain at least 6 characters.";
-
-        case "auth/invalid-credential":
-            return "Incorrect email or password.";
-
-        case "auth/user-not-found":
-            return "No account was found with this email.";
-
-        case "auth/wrong-password":
-            return "Incorrect password.";
-
-        case "auth/too-many-requests":
-            return "Too many attempts. Please try again later.";
-
-        case "auth/network-request-failed":
-            return "Internet connection problem. Please try again.";
-
-        case "auth/operation-not-allowed":
-            return "Email/password login is not enabled in Firebase.";
-
-        case "auth/api-key-not-valid":
-            return "Firebase API key is not valid.";
-
-        case "permission-denied":
-            return "Firebase permission denied. Check your Firestore rules.";
-
-        case "failed-precondition":
-            return "Firebase setup is incomplete. Check Firestore.";
-
-        default:
-            return error.message || "Something went wrong.";
+    if (code === "auth/email-already-in-use") {
+        return "This email is already registered.";
     }
+
+    if (code === "auth/invalid-email") {
+        return "Please enter a valid email.";
+    }
+
+    if (code === "auth/weak-password") {
+        return "Password must contain at least 6 characters.";
+    }
+
+    if (code === "auth/invalid-credential") {
+        return "Incorrect email or password.";
+    }
+
+    if (code === "auth/user-not-found") {
+        return "No account was found with this email.";
+    }
+
+    if (code === "auth/wrong-password") {
+        return "Incorrect password.";
+    }
+
+    if (code === "auth/operation-not-allowed") {
+        return "Email/password authentication is not enabled in Firebase.";
+    }
+
+    if (code === "permission-denied") {
+        return "Firebase permission denied. Check your Firestore rules.";
+    }
+
+    if (code === "failed-precondition") {
+        return "Firestore needs to be configured correctly.";
+    }
+
+    if (code === "auth/network-request-failed") {
+        return "Internet connection problem.";
+    }
+
+    return error?.message || "Something went wrong.";
 }
 
 
 /* =========================================================
-   7. AUTHENTICATION STATE
-   ========================================================= */
+   AUTH STATE
+========================================================= */
 
 onAuthStateChanged(auth, async (user) => {
 
@@ -185,16 +168,18 @@ onAuthStateChanged(auth, async (user) => {
     } catch (error) {
 
         console.error(
-            "Authentication state error:",
+            "Startup error:",
             error
         );
+
     }
+
 });
 
 
 /* =========================================================
-   8. UPDATE LOGIN UI
-   ========================================================= */
+   AUTH UI
+========================================================= */
 
 function updateAuthUI() {
 
@@ -203,7 +188,8 @@ function updateAuthUI() {
         .forEach(element => {
 
             element.style.display =
-                currentUser ? "block" : "none";
+                currentUser ? "" : "none";
+
         });
 
 
@@ -212,7 +198,8 @@ function updateAuthUI() {
         .forEach(element => {
 
             element.style.display =
-                currentUser ? "none" : "block";
+                currentUser ? "none" : "";
+
         });
 
 
@@ -220,39 +207,38 @@ function updateAuthUI() {
 
     if (userName) {
 
-        if (currentUser) {
+        userName.textContent =
+            currentUser
+                ? (
+                    currentUser.displayName ||
+                    currentUser.email.split("@")[0]
+                )
+                : "";
 
-            userName.textContent =
-                currentUser.displayName ||
-                currentUser.email.split("@")[0];
-
-        } else {
-
-            userName.textContent = "";
-        }
     }
+
 }
 
 
 /* =========================================================
-   9. SIGN UP
-   ========================================================= */
+   SIGN UP
+========================================================= */
 
 window.signup = async function () {
 
     const username =
-        getValue("signupUsername");
+        value("signupUsername");
 
     const email =
-        getValue("signupEmail");
+        value("signupEmail");
 
     const password =
-        getValue("signupPassword");
+        value("signupPassword");
 
 
     if (!username) {
 
-        message("Please enter a username.");
+        notify("Please enter a username.");
 
         return;
     }
@@ -260,7 +246,7 @@ window.signup = async function () {
 
     if (!email) {
 
-        message("Please enter your email.");
+        notify("Please enter your email.");
 
         return;
     }
@@ -268,7 +254,7 @@ window.signup = async function () {
 
     if (!password) {
 
-        message("Please enter a password.");
+        notify("Please enter a password.");
 
         return;
     }
@@ -276,7 +262,7 @@ window.signup = async function () {
 
     if (password.length < 6) {
 
-        message(
+        notify(
             "Password must be at least 6 characters."
         );
 
@@ -297,11 +283,12 @@ window.signup = async function () {
         const user = result.user;
 
 
-        await updateProfile(user, {
-
-            displayName: username
-
-        });
+        await updateProfile(
+            user,
+            {
+                displayName: username
+            }
+        );
 
 
         await setDoc(
@@ -311,19 +298,12 @@ window.signup = async function () {
                 user.uid
             ),
             {
-
                 username: username,
-
                 country: "",
-
                 bio: "",
-
                 points: 0,
-
                 joinedMissionIMO: true,
-
-                createdAt:
-                    serverTimestamp()
+                createdAt: serverTimestamp()
             }
         );
 
@@ -335,26 +315,16 @@ window.signup = async function () {
                 user.uid
             ),
             {
-
-                userId:
-                    user.uid,
-
-                username:
-                    username,
-
-                points:
-                    0,
-
-                createdAt:
-                    serverTimestamp()
+                userId: user.uid,
+                username: username,
+                points: 0,
+                createdAt: serverTimestamp()
             }
         );
 
 
-        message(
-            "Account created successfully! Welcome to Mission IMO, " +
-            username +
-            "! 🚀"
+        notify(
+            "Account created successfully! Welcome to Mission IMO!"
         );
 
 
@@ -365,34 +335,31 @@ window.signup = async function () {
             form.reset();
         }
 
-
     } catch (error) {
 
-        message(
-            firebaseError(error)
-        );
+        notify(firebaseError(error));
+
     }
+
 };
 
 
 /* =========================================================
-   10. LOGIN
-   ========================================================= */
+   LOGIN
+========================================================= */
 
 window.login = async function () {
 
     const email =
-        getValue("loginEmail");
+        value("loginEmail");
 
     const password =
-        getValue("loginPassword");
+        value("loginPassword");
 
 
     if (!email) {
 
-        message(
-            "Please enter your email."
-        );
+        notify("Please enter your email.");
 
         return;
     }
@@ -400,9 +367,7 @@ window.login = async function () {
 
     if (!password) {
 
-        message(
-            "Please enter your password."
-        );
+        notify("Please enter your password.");
 
         return;
     }
@@ -417,8 +382,8 @@ window.login = async function () {
         );
 
 
-        message(
-            "Welcome back to Mission IMO! 🧠"
+        notify(
+            "Welcome back to Mission IMO!"
         );
 
 
@@ -429,19 +394,18 @@ window.login = async function () {
             form.reset();
         }
 
-
     } catch (error) {
 
-        message(
-            firebaseError(error)
-        );
+        notify(firebaseError(error));
+
     }
+
 };
 
 
 /* =========================================================
-   11. LOGOUT
-   ========================================================= */
+   LOGOUT
+========================================================= */
 
 window.logout = async function () {
 
@@ -449,7 +413,7 @@ window.logout = async function () {
 
         await signOut(auth);
 
-        message(
+        notify(
             "You have been logged out."
         );
 
@@ -457,16 +421,18 @@ window.logout = async function () {
 
         console.error(error);
 
-        message(
+        notify(
             "Logout failed."
         );
+
     }
+
 };
 
 
 /* =========================================================
-   12. CREATE MISSING PROFILE
-   ========================================================= */
+   PROFILE
+========================================================= */
 
 async function createMissingProfile() {
 
@@ -475,92 +441,78 @@ async function createMissingProfile() {
     }
 
 
-    try {
-
-        const profileRef =
-            doc(
-                db,
-                "profiles",
-                currentUser.uid
-            );
-
-
-        const profile =
-            await getDoc(profileRef);
-
-
-        if (!profile.exists()) {
-
-            await setDoc(
-                profileRef,
-                {
-
-                    username:
-                        currentUser.displayName ||
-                        currentUser.email.split("@")[0],
-
-                    country: "",
-
-                    bio: "",
-
-                    points: 0,
-
-                    joinedMissionIMO: true,
-
-                    createdAt:
-                        serverTimestamp()
-                }
-            );
-        }
-
-
-        const pointsRef =
-            doc(
-                db,
-                "userPoints",
-                currentUser.uid
-            );
-
-
-        const points =
-            await getDoc(pointsRef);
-
-
-        if (!points.exists()) {
-
-            await setDoc(
-                pointsRef,
-                {
-
-                    userId:
-                        currentUser.uid,
-
-                    username:
-                        currentUser.displayName ||
-                        currentUser.email.split("@")[0],
-
-                    points: 0,
-
-                    createdAt:
-                        serverTimestamp()
-                }
-            );
-        }
-
-
-    } catch (error) {
-
-        console.error(
-            "Profile creation error:",
-            error
+    const profileRef =
+        doc(
+            db,
+            "profiles",
+            currentUser.uid
         );
+
+
+    const profile =
+        await getDoc(profileRef);
+
+
+    if (!profile.exists()) {
+
+        await setDoc(
+            profileRef,
+            {
+                username:
+                    currentUser.displayName ||
+                    currentUser.email.split("@")[0],
+
+                country: "",
+
+                bio: "",
+
+                points: 0,
+
+                joinedMissionIMO: true,
+
+                createdAt:
+                    serverTimestamp()
+            }
+        );
+
     }
+
+
+    const pointsRef =
+        doc(
+            db,
+            "userPoints",
+            currentUser.uid
+        );
+
+
+    const points =
+        await getDoc(pointsRef);
+
+
+    if (!points.exists()) {
+
+        await setDoc(
+            pointsRef,
+            {
+                userId:
+                    currentUser.uid,
+
+                username:
+                    currentUser.displayName ||
+                    currentUser.email.split("@")[0],
+
+                points: 0,
+
+                createdAt:
+                    serverTimestamp()
+            }
+        );
+
+    }
+
 }
 
-
-/* =========================================================
-   13. LOAD PROFILE
-   ========================================================= */
 
 async function loadProfile() {
 
@@ -571,16 +523,14 @@ async function loadProfile() {
 
     try {
 
-        const profileRef =
-            doc(
-                db,
-                "profiles",
-                currentUser.uid
-            );
-
-
         const snapshot =
-            await getDoc(profileRef);
+            await getDoc(
+                doc(
+                    db,
+                    "profiles",
+                    currentUser.uid
+                )
+            );
 
 
         if (!snapshot.exists()) {
@@ -592,56 +542,46 @@ async function loadProfile() {
             snapshot.data();
 
 
-        const username =
-            $("profileUsername");
+        if ($("profileUsername")) {
 
-        const country =
-            $("profileCountry");
-
-        const bio =
-            $("profileBio");
-
-
-        if (username) {
-
-            username.value =
+            $("profileUsername").value =
                 profile.username || "";
+
         }
 
 
-        if (country) {
+        if ($("profileCountry")) {
 
-            country.value =
+            $("profileCountry").value =
                 profile.country || "";
+
         }
 
 
-        if (bio) {
+        if ($("profileBio")) {
 
-            bio.value =
+            $("profileBio").value =
                 profile.bio || "";
-        }
 
+        }
 
     } catch (error) {
 
         console.error(
-            "Profile loading error:",
+            "Profile error:",
             error
         );
+
     }
+
 }
 
-
-/* =========================================================
-   14. SAVE PROFILE
-   ========================================================= */
 
 window.saveProfile = async function () {
 
     if (!currentUser) {
 
-        message(
+        notify(
             "Please log in first."
         );
 
@@ -650,18 +590,18 @@ window.saveProfile = async function () {
 
 
     const username =
-        getValue("profileUsername");
+        value("profileUsername");
 
     const country =
-        getValue("profileCountry");
+        value("profileCountry");
 
     const bio =
-        getValue("profileBio");
+        value("profileBio");
 
 
     if (!username) {
 
-        message(
+        notify(
             "Username cannot be empty."
         );
 
@@ -678,19 +618,11 @@ window.saveProfile = async function () {
                 currentUser.uid
             ),
             {
-
-                username:
-                    username,
-
-                country:
-                    country,
-
-                bio:
-                    bio,
-
+                username,
+                country,
+                bio,
                 updatedAt:
                     serverTimestamp()
-
             },
             {
                 merge: true
@@ -701,8 +633,7 @@ window.saveProfile = async function () {
         await updateProfile(
             currentUser,
             {
-                displayName:
-                    username
+                displayName: username
             }
         );
 
@@ -714,10 +645,7 @@ window.saveProfile = async function () {
                 currentUser.uid
             ),
             {
-
-                username:
-                    username
-
+                username
             },
             {
                 merge: true
@@ -727,35 +655,30 @@ window.saveProfile = async function () {
 
         updateAuthUI();
 
-
-        message(
-            "Profile updated successfully! ✅"
-        );
-
-
         await loadLeaderboard();
 
+        notify(
+            "Profile updated successfully!"
+        );
 
     } catch (error) {
 
-        console.error(error);
+        notify(firebaseError(error));
 
-        message(
-            firebaseError(error)
-        );
     }
+
 };
 
 
 /* =========================================================
-   15. CREATE DISCUSSION POST
-   ========================================================= */
+   DISCUSSIONS
+========================================================= */
 
 window.createPost = async function () {
 
     if (!currentUser) {
 
-        message(
+        notify(
             "Please log in before posting."
         );
 
@@ -764,15 +687,15 @@ window.createPost = async function () {
 
 
     const title =
-        getValue("postTitle");
+        value("postTitle");
 
     const content =
-        getValue("postContent");
+        value("postContent");
 
 
     if (!title || !content) {
 
-        message(
+        notify(
             "Please enter a title and message."
         );
 
@@ -783,14 +706,13 @@ window.createPost = async function () {
     try {
 
         await addDoc(
-            collection(db, "posts"),
+            collection(
+                db,
+                "posts"
+            ),
             {
-
-                title:
-                    title,
-
-                content:
-                    content,
+                title,
+                content,
 
                 authorId:
                     currentUser.uid,
@@ -805,11 +727,6 @@ window.createPost = async function () {
         );
 
 
-        message(
-            "Discussion posted! 🎉"
-        );
-
-
         const form =
             $("postForm");
 
@@ -820,21 +737,18 @@ window.createPost = async function () {
 
         await loadPosts();
 
+        notify(
+            "Discussion posted!"
+        );
 
     } catch (error) {
 
-        console.error(error);
+        notify(firebaseError(error));
 
-        message(
-            firebaseError(error)
-        );
     }
+
 };
 
-
-/* =========================================================
-   16. LOAD DISCUSSIONS
-   ========================================================= */
 
 async function loadPosts() {
 
@@ -851,7 +765,10 @@ async function loadPosts() {
 
         const postsQuery =
             query(
-                collection(db, "posts"),
+                collection(
+                    db,
+                    "posts"
+                ),
                 orderBy(
                     "createdAt",
                     "desc"
@@ -878,74 +795,69 @@ async function loadPosts() {
         }
 
 
-        snapshot.forEach(postDoc => {
+        snapshot.forEach(
+            postDoc => {
 
-            const post =
-                postDoc.data();
-
-
-            const card =
-                document.createElement(
-                    "article"
-                );
+                const post =
+                    postDoc.data();
 
 
-            card.className =
-                "post-card";
+                const card =
+                    document.createElement(
+                        "article"
+                    );
 
 
-            card.innerHTML = `
-
-                <h3>
-                    ${escapeHTML(
-                        post.title
-                    )}
-                </h3>
-
-                <p>
-                    ${escapeHTML(
-                        post.content
-                    )}
-                </p>
-
-                <small>
-                    By
-                    ${escapeHTML(
-                        post.authorName ||
-                        "Student"
-                    )}
-                </small>
-
-            `;
+                card.className =
+                    "post-card";
 
 
-            container.appendChild(card);
+                card.innerHTML = `
+                    <h3>
+                        ${escapeHTML(post.title)}
+                    </h3>
 
-        });
+                    <p>
+                        ${escapeHTML(post.content)}
+                    </p>
 
+                    <small>
+                        By ${escapeHTML(
+                            post.authorName || "Student"
+                        )}
+                    </small>
+                `;
+
+
+                container.appendChild(card);
+
+            }
+        );
 
     } catch (error) {
 
         console.error(
-            "Posts loading error:",
+            "Posts error:",
             error
         );
 
         container.innerHTML =
-            "<p>Unable to load discussions right now.</p>";
+            "<p>Unable to load discussions.</p>";
+
     }
+
 }
 
 
 /* =========================================================
-   17. SUBMIT COMMUNITY PROBLEM
-   ========================================================= */
+   COMMUNITY PROBLEMS
+========================================================= */
 
 window.submitProblem = async function () {
 
     if (!currentUser) {
 
-        message(
+        notify(
             "Please log in before submitting a problem."
         );
 
@@ -954,29 +866,19 @@ window.submitProblem = async function () {
 
 
     const title =
-        getValue("problemTitle");
+        value("problemTitle");
 
     const statement =
-        getValue("problemStatement");
+        value("problemStatement");
 
     const difficulty =
-        getValue("problemDifficulty");
+        value("problemDifficulty");
 
 
-    if (!title) {
+    if (!title || !statement) {
 
-        message(
-            "Please enter a problem title."
-        );
-
-        return;
-    }
-
-
-    if (!statement) {
-
-        message(
-            "Please enter the problem statement."
+        notify(
+            "Please enter the problem title and statement."
         );
 
         return;
@@ -986,14 +888,13 @@ window.submitProblem = async function () {
     try {
 
         await addDoc(
-            collection(db, "problems"),
+            collection(
+                db,
+                "problems"
+            ),
             {
-
-                title:
-                    title,
-
-                statement:
-                    statement,
+                title,
+                statement,
 
                 difficulty:
                     difficulty ||
@@ -1012,11 +913,6 @@ window.submitProblem = async function () {
         );
 
 
-        message(
-            "Problem submitted successfully! 🧠"
-        );
-
-
         const form =
             $("problemForm");
 
@@ -1027,21 +923,18 @@ window.submitProblem = async function () {
 
         await loadProblems();
 
+        notify(
+            "Problem submitted successfully!"
+        );
 
     } catch (error) {
 
-        console.error(error);
+        notify(firebaseError(error));
 
-        message(
-            firebaseError(error)
-        );
     }
+
 };
 
-
-/* =========================================================
-   18. LOAD COMMUNITY PROBLEMS
-   ========================================================= */
 
 async function loadProblems() {
 
@@ -1058,7 +951,10 @@ async function loadProblems() {
 
         const problemsQuery =
             query(
-                collection(db, "problems"),
+                collection(
+                    db,
+                    "problems"
+                ),
                 orderBy(
                     "createdAt",
                     "desc"
@@ -1085,39 +981,18 @@ async function loadProblems() {
         }
 
 
-        snapshot.forEach(problemDoc => {
+        snapshot.forEach(
+            problemDoc => {
 
-            const problem =
-                problemDoc.data();
-
-
-            const card =
-                document.createElement(
-                    "article"
-                );
+                const problem =
+                    problemDoc.data();
 
 
-            card.className =
-                "problem-card";
+                const card =
+                    document.createElement(
+                        "article"
+                    );
 
 
-            card.innerHTML = `
-
-                <h3>
-                    ${escapeHTML(
-                        problem.title
-                    )}
-                </h3>
-
-                <p>
-                    ${escapeHTML(
-                        problem.statement
-                    )}
-                </p>
-
-                <strong>
-                    Difficulty:
-                    ${escapeHTML(
-                        problem.difficulty ||
-                        "Unspecified"
-       
+                card.className =
+                    "    
