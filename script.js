@@ -4,18 +4,15 @@
 
 /* =========================================================
    1. FIREBASE CONFIG
-   =========================================================
-   REPLACE THESE VALUES WITH YOUR REAL FIREBASE CONFIG.
-   Firebase Console → Project Settings → Your apps → Web app
    ========================================================= */
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCtMvHetBaYOQ2JbuIMjFka4S6H-6VIxc8",
+    apiKey: "AIzaSyCtMvHetBaYO2QJbuIMjFka4S6H-6VIxc8",
     authDomain: "mission-imo.firebaseapp.com",
     projectId: "mission-imo",
     storageBucket: "mission-imo.firebasestorage.app",
     messagingSenderId: "926204356108",
-    appId: "G-QWKY6QSTTC"
+    appId: "1:926204356108:web:12f1fa10de9e5c8e397029"
 };
 
 
@@ -78,11 +75,14 @@ function $(id) {
 
 
 function getValue(id) {
+
     const element = $(id);
 
-    return element
-        ? element.value.trim()
-        : "";
+    if (!element) {
+        return "";
+    }
+
+    return element.value.trim();
 }
 
 
@@ -101,7 +101,13 @@ function escapeHTML(value) {
 }
 
 
+/* =========================================================
+   6. FIREBASE ERROR HANDLER
+   ========================================================= */
+
 function firebaseError(error) {
+
+    console.error("Firebase error:", error);
 
     switch (error.code) {
 
@@ -109,7 +115,7 @@ function firebaseError(error) {
             return "This email is already registered.";
 
         case "auth/invalid-email":
-            return "Please enter a valid email.";
+            return "Please enter a valid email address.";
 
         case "auth/weak-password":
             return "Password must contain at least 6 characters.";
@@ -118,13 +124,28 @@ function firebaseError(error) {
             return "Incorrect email or password.";
 
         case "auth/user-not-found":
-            return "No account found with this email.";
+            return "No account was found with this email.";
 
         case "auth/wrong-password":
             return "Incorrect password.";
 
         case "auth/too-many-requests":
-            return "Too many attempts. Try again later.";
+            return "Too many attempts. Please try again later.";
+
+        case "auth/network-request-failed":
+            return "Internet connection problem. Please try again.";
+
+        case "auth/operation-not-allowed":
+            return "Email/password login is not enabled in Firebase.";
+
+        case "auth/api-key-not-valid":
+            return "Firebase API key is not valid.";
+
+        case "permission-denied":
+            return "Firebase permission denied. Check your Firestore rules.";
+
+        case "failed-precondition":
+            return "Firebase setup is incomplete. Check Firestore.";
 
         default:
             return error.message || "Something went wrong.";
@@ -133,7 +154,7 @@ function firebaseError(error) {
 
 
 /* =========================================================
-   6. AUTHENTICATION STATE
+   7. AUTHENTICATION STATE
    ========================================================= */
 
 onAuthStateChanged(auth, async (user) => {
@@ -142,7 +163,11 @@ onAuthStateChanged(auth, async (user) => {
 
     updateAuthUI();
 
-    if (user) {
+    if (!user) {
+        return;
+    }
+
+    try {
 
         await createMissingProfile();
 
@@ -155,12 +180,19 @@ onAuthStateChanged(auth, async (user) => {
         await loadLeaderboard();
 
         await loadChallenges();
+
+    } catch (error) {
+
+        console.error(
+            "Authentication state error:",
+            error
+        );
     }
 });
 
 
 /* =========================================================
-   7. UPDATE LOGIN UI
+   8. UPDATE LOGIN UI
    ========================================================= */
 
 function updateAuthUI() {
@@ -170,7 +202,7 @@ function updateAuthUI() {
         .forEach(element => {
 
             element.style.display =
-                currentUser ? "" : "none";
+                currentUser ? "block" : "none";
         });
 
 
@@ -179,23 +211,30 @@ function updateAuthUI() {
         .forEach(element => {
 
             element.style.display =
-                currentUser ? "none" : "";
+                currentUser ? "none" : "block";
         });
 
 
     const userName = $("userName");
 
-    if (userName && currentUser) {
+    if (userName) {
 
-        userName.textContent =
-            currentUser.displayName ||
-            currentUser.email.split("@")[0];
+        if (currentUser) {
+
+            userName.textContent =
+                currentUser.displayName ||
+                currentUser.email.split("@")[0];
+
+        } else {
+
+            userName.textContent = "";
+        }
     }
 }
 
 
 /* =========================================================
-   8. SIGN UP
+   9. SIGN UP
    ========================================================= */
 
 window.signup = async function () {
@@ -210,9 +249,25 @@ window.signup = async function () {
         getValue("signupPassword");
 
 
-    if (!username || !email || !password) {
+    if (!username) {
 
-        message("Please fill in all fields.");
+        message("Please enter a username.");
+
+        return;
+    }
+
+
+    if (!email) {
+
+        message("Please enter your email.");
+
+        return;
+    }
+
+
+    if (!password) {
+
+        message("Please enter a password.");
 
         return;
     }
@@ -249,12 +304,14 @@ window.signup = async function () {
 
 
         await setDoc(
-            doc(db, "profiles", user.uid),
+            doc(
+                db,
+                "profiles",
+                user.uid
+            ),
             {
 
                 username: username,
-
-                email: email,
 
                 country: "",
 
@@ -264,49 +321,61 @@ window.signup = async function () {
 
                 joinedMissionIMO: true,
 
-                createdAt: serverTimestamp()
+                createdAt:
+                    serverTimestamp()
             }
         );
 
 
         await setDoc(
-            doc(db, "userPoints", user.uid),
+            doc(
+                db,
+                "userPoints",
+                user.uid
+            ),
             {
 
-                userId: user.uid,
+                userId:
+                    user.uid,
 
-                username: username,
+                username:
+                    username,
 
-                points: 0,
+                points:
+                    0,
 
-                createdAt: serverTimestamp()
+                createdAt:
+                    serverTimestamp()
             }
         );
 
 
         message(
-            "Welcome to Mission IMO, " +
+            "Account created successfully! Welcome to Mission IMO, " +
             username +
             "! 🚀"
         );
 
 
-        const form = $("signupForm");
+        const form =
+            $("signupForm");
 
-        if (form) form.reset();
+        if (form) {
+            form.reset();
+        }
 
 
     } catch (error) {
 
-        console.error(error);
-
-        message(firebaseError(error));
+        message(
+            firebaseError(error)
+        );
     }
 };
 
 
 /* =========================================================
-   9. LOGIN
+   10. LOGIN
    ========================================================= */
 
 window.login = async function () {
@@ -318,10 +387,20 @@ window.login = async function () {
         getValue("loginPassword");
 
 
-    if (!email || !password) {
+    if (!email) {
 
         message(
-            "Please enter your email and password."
+            "Please enter your email."
+        );
+
+        return;
+    }
+
+
+    if (!password) {
+
+        message(
+            "Please enter your password."
         );
 
         return;
@@ -337,25 +416,30 @@ window.login = async function () {
         );
 
 
-        message("Welcome back! 🧠");
+        message(
+            "Welcome back to Mission IMO! 🧠"
+        );
 
 
-        const form = $("loginForm");
+        const form =
+            $("loginForm");
 
-        if (form) form.reset();
+        if (form) {
+            form.reset();
+        }
 
 
     } catch (error) {
 
-        console.error(error);
-
-        message(firebaseError(error));
+        message(
+            firebaseError(error)
+        );
     }
 };
 
 
 /* =========================================================
-   10. LOGOUT
+   11. LOGOUT
    ========================================================= */
 
 window.logout = async function () {
@@ -364,74 +448,124 @@ window.logout = async function () {
 
         await signOut(auth);
 
-        message("You have been logged out.");
+        message(
+            "You have been logged out."
+        );
 
     } catch (error) {
 
         console.error(error);
 
-        message("Logout failed.");
+        message(
+            "Logout failed."
+        );
     }
 };
 
 
 /* =========================================================
-   11. CREATE PROFILE IF MISSING
+   12. CREATE MISSING PROFILE
    ========================================================= */
 
 async function createMissingProfile() {
 
-    if (!currentUser) return;
+    if (!currentUser) {
+        return;
+    }
 
 
-    const profileRef =
-        doc(
-            db,
-            "profiles",
-            currentUser.uid
-        );
+    try {
+
+        const profileRef =
+            doc(
+                db,
+                "profiles",
+                currentUser.uid
+            );
 
 
-    const profile =
-        await getDoc(profileRef);
+        const profile =
+            await getDoc(profileRef);
 
 
-    if (!profile.exists()) {
+        if (!profile.exists()) {
 
-        await setDoc(
-            profileRef,
-            {
+            await setDoc(
+                profileRef,
+                {
 
-                username:
-                    currentUser.displayName ||
-                    currentUser.email.split("@")[0],
+                    username:
+                        currentUser.displayName ||
+                        currentUser.email.split("@")[0],
 
-                email:
-                    currentUser.email,
+                    country: "",
 
-                country: "",
+                    bio: "",
 
-                bio: "",
+                    points: 0,
 
-                points: 0,
+                    joinedMissionIMO: true,
 
-                joinedMissionIMO: true,
+                    createdAt:
+                        serverTimestamp()
+                }
+            );
+        }
 
-                createdAt:
-                    serverTimestamp()
-            }
+
+        const pointsRef =
+            doc(
+                db,
+                "userPoints",
+                currentUser.uid
+            );
+
+
+        const points =
+            await getDoc(pointsRef);
+
+
+        if (!points.exists()) {
+
+            await setDoc(
+                pointsRef,
+                {
+
+                    userId:
+                        currentUser.uid,
+
+                    username:
+                        currentUser.displayName ||
+                        currentUser.email.split("@")[0],
+
+                    points: 0,
+
+                    createdAt:
+                        serverTimestamp()
+                }
+            );
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Profile creation error:",
+            error
         );
     }
 }
 
 
 /* =========================================================
-   12. LOAD PROFILE
+   13. LOAD PROFILE
    ========================================================= */
 
 async function loadProfile() {
 
-    if (!currentUser) return;
+    if (!currentUser) {
+        return;
+    }
 
 
     try {
@@ -448,7 +582,9 @@ async function loadProfile() {
             await getDoc(profileRef);
 
 
-        if (!snapshot.exists()) return;
+        if (!snapshot.exists()) {
+            return;
+        }
 
 
         const profile =
@@ -465,25 +601,31 @@ async function loadProfile() {
             $("profileBio");
 
 
-        if (username)
+        if (username) {
+
             username.value =
                 profile.username || "";
+        }
 
 
-        if (country)
+        if (country) {
+
             country.value =
                 profile.country || "";
+        }
 
 
-        if (bio)
+        if (bio) {
+
             bio.value =
                 profile.bio || "";
+        }
 
 
     } catch (error) {
 
         console.error(
-            "Profile error:",
+            "Profile loading error:",
             error
         );
     }
@@ -491,7 +633,7 @@ async function loadProfile() {
 
 
 /* =========================================================
-   13. SAVE PROFILE
+   14. SAVE PROFILE
    ========================================================= */
 
 window.saveProfile = async function () {
@@ -536,14 +678,14 @@ window.saveProfile = async function () {
             ),
             {
 
-                username,
+                username:
+                    username,
 
-                country,
+                country:
+                    country,
 
-                bio,
-
-                email:
-                    currentUser.email,
+                bio:
+                    bio,
 
                 updatedAt:
                     serverTimestamp()
@@ -558,7 +700,26 @@ window.saveProfile = async function () {
         await updateProfile(
             currentUser,
             {
-                displayName: username
+                displayName:
+                    username
+            }
+        );
+
+
+        await setDoc(
+            doc(
+                db,
+                "userPoints",
+                currentUser.uid
+            ),
+            {
+
+                username:
+                    username
+
+            },
+            {
+                merge: true
             }
         );
 
@@ -567,8 +728,11 @@ window.saveProfile = async function () {
 
 
         message(
-            "Profile updated! ✅"
+            "Profile updated successfully! ✅"
         );
+
+
+        await loadLeaderboard();
 
 
     } catch (error) {
@@ -576,14 +740,14 @@ window.saveProfile = async function () {
         console.error(error);
 
         message(
-            "Could not update your profile."
+            firebaseError(error)
         );
     }
 };
 
 
 /* =========================================================
-   14. CREATE DISCUSSION POST
+   15. CREATE DISCUSSION POST
    ========================================================= */
 
 window.createPost = async function () {
@@ -621,9 +785,11 @@ window.createPost = async function () {
             collection(db, "posts"),
             {
 
-                title,
+                title:
+                    title,
 
-                content,
+                content:
+                    content,
 
                 authorId:
                     currentUser.uid,
@@ -646,7 +812,9 @@ window.createPost = async function () {
         const form =
             $("postForm");
 
-        if (form) form.reset();
+        if (form) {
+            form.reset();
+        }
 
 
         await loadPosts();
@@ -657,14 +825,14 @@ window.createPost = async function () {
         console.error(error);
 
         message(
-            "Could not create the discussion."
+            firebaseError(error)
         );
     }
 };
 
 
 /* =========================================================
-   15. LOAD DISCUSSIONS
+   16. LOAD DISCUSSIONS
    ========================================================= */
 
 async function loadPosts() {
@@ -673,7 +841,9 @@ async function loadPosts() {
         $("postsContainer");
 
 
-    if (!container) return;
+    if (!container) {
+        return;
+    }
 
 
     try {
@@ -681,13 +851,18 @@ async function loadPosts() {
         const postsQuery =
             query(
                 collection(db, "posts"),
-                orderBy("createdAt", "desc"),
+                orderBy(
+                    "createdAt",
+                    "desc"
+                ),
                 limit(50)
             );
 
 
         const snapshot =
-            await getDocs(postsQuery);
+            await getDocs(
+                postsQuery
+            );
 
 
         container.innerHTML = "";
@@ -709,7 +884,9 @@ async function loadPosts() {
 
 
             const card =
-                document.createElement("article");
+                document.createElement(
+                    "article"
+                );
 
 
             card.className =
@@ -719,17 +896,22 @@ async function loadPosts() {
             card.innerHTML = `
 
                 <h3>
-                    ${escapeHTML(post.title)}
+                    ${escapeHTML(
+                        post.title
+                    )}
                 </h3>
 
                 <p>
-                    ${escapeHTML(post.content)}
+                    ${escapeHTML(
+                        post.content
+                    )}
                 </p>
 
                 <small>
                     By
                     ${escapeHTML(
-                        post.authorName || "Student"
+                        post.authorName ||
+                        "Student"
                     )}
                 </small>
 
@@ -737,21 +919,25 @@ async function loadPosts() {
 
 
             container.appendChild(card);
+
         });
 
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Posts loading error:",
+            error
+        );
 
         container.innerHTML =
-            "<p>Unable to load discussions.</p>";
+            "<p>Unable to load discussions right now.</p>";
     }
 }
 
 
 /* =========================================================
-   16. SUBMIT PROBLEM
+   17. SUBMIT COMMUNITY PROBLEM
    ========================================================= */
 
 window.submitProblem = async function () {
@@ -776,10 +962,20 @@ window.submitProblem = async function () {
         getValue("problemDifficulty");
 
 
-    if (!title || !statement) {
+    if (!title) {
 
         message(
-            "Please enter the problem title and statement."
+            "Please enter a problem title."
+        );
+
+        return;
+    }
+
+
+    if (!statement) {
+
+        message(
+            "Please enter the problem statement."
         );
 
         return;
@@ -792,12 +988,15 @@ window.submitProblem = async function () {
             collection(db, "problems"),
             {
 
-                title,
+                title:
+                    title,
 
-                statement,
+                statement:
+                    statement,
 
                 difficulty:
-                    difficulty || "Unspecified",
+                    difficulty ||
+                    "Unspecified",
 
                 authorId:
                     currentUser.uid,
@@ -813,14 +1012,16 @@ window.submitProblem = async function () {
 
 
         message(
-            "Problem submitted! 🧠"
+            "Problem submitted successfully! 🧠"
         );
 
 
         const form =
             $("problemForm");
 
-        if (form) form.reset();
+        if (form) {
+            form.reset();
+        }
 
 
         await loadProblems();
@@ -831,14 +1032,14 @@ window.submitProblem = async function () {
         console.error(error);
 
         message(
-            "Could not submit the problem."
+            firebaseError(error)
         );
     }
 };
 
 
 /* =========================================================
-   17. LOAD COMMUNITY PROBLEMS
+   18. LOAD COMMUNITY PROBLEMS
    ========================================================= */
 
 async function loadProblems() {
@@ -847,7 +1048,9 @@ async function loadProblems() {
         $("problemsContainer");
 
 
-    if (!container) return;
+    if (!container) {
+        return;
+    }
 
 
     try {
@@ -855,13 +1058,18 @@ async function loadProblems() {
         const problemsQuery =
             query(
                 collection(db, "problems"),
-                orderBy("createdAt", "desc"),
+                orderBy(
+                    "createdAt",
+                    "desc"
+                ),
                 limit(50)
             );
 
 
         const snapshot =
-            await getDocs(problemsQuery);
+            await getDocs(
+                problemsQuery
+            );
 
 
         container.innerHTML = "";
@@ -883,7 +1091,9 @@ async function loadProblems() {
 
 
             const card =
-                document.createElement("article");
+                document.createElement(
+                    "article"
+                );
 
 
             card.className =
@@ -893,11 +1103,15 @@ async function loadProblems() {
             card.innerHTML = `
 
                 <h3>
-                    ${escapeHTML(problem.title)}
+                    ${escapeHTML(
+                        problem.title
+                    )}
                 </h3>
 
                 <p>
-                    ${escapeHTML(problem.statement)}
+                    ${escapeHTML(
+                        problem.statement
+                    )}
                 </p>
 
                 <strong>
@@ -905,202 +1119,4 @@ async function loadProblems() {
                     ${escapeHTML(
                         problem.difficulty ||
                         "Unspecified"
-                    )}
-                </strong>
-
-                <br>
-
-                <small>
-                    Submitted by
-                    ${escapeHTML(
-                        problem.authorName ||
-                        "Student"
-                    )}
-                </small>
-
-            `;
-
-
-            container.appendChild(card);
-        });
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        container.innerHTML =
-            "<p>Unable to load problems.</p>";
-    }
-}
-
-
-/* =========================================================
-   18. LOAD LEADERBOARD
-   ========================================================= */
-
-async function loadLeaderboard() {
-
-    const container =
-        $("leaderboardContainer");
-
-
-    if (!container) return;
-
-
-    try {
-
-        const leaderboardQuery =
-            query(
-                collection(db, "userPoints"),
-                orderBy("points", "desc"),
-                limit(50)
-            );
-
-
-        const snapshot =
-            await getDocs(
-                leaderboardQuery
-            );
-
-
-        container.innerHTML = "";
-
-
-        if (snapshot.empty) {
-
-            container.innerHTML =
-                "<p>No leaderboard data yet.</p>";
-
-            return;
-        }
-
-
-        let rank = 1;
-
-
-        snapshot.forEach(userDoc => {
-
-            const user =
-                userDoc.data();
-
-
-            const row =
-                document.createElement("div");
-
-
-            row.className =
-                "leaderboard-row";
-
-
-            row.innerHTML = `
-
-                <span>
-                    #${rank}
-                </span>
-
-                <strong>
-                    ${escapeHTML(
-                        user.username ||
-                        "Student"
-                    )}
-                </strong>
-
-                <span>
-                    ${Number(
-                        user.points || 0
-                    )}
-                    points
-                </span>
-
-            `;
-
-
-            container.appendChild(row);
-
-
-            rank++;
-        });
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        container.innerHTML =
-            "<p>Unable to load leaderboard.</p>";
-    }
-}
-
-
-/* =========================================================
-   19. LOAD CHALLENGES
-   ========================================================= */
-
-async function loadChallenges() {
-
-    const container =
-        $("challengesContainer");
-
-
-    if (!container) return;
-
-
-    try {
-
-        const challengeQuery =
-            query(
-                collection(db, "challenges"),
-                limit(20)
-            );
-
-
-        const snapshot =
-            await getDocs(
-                challengeQuery
-            );
-
-
-        container.innerHTML = "";
-
-
-        if (snapshot.empty) {
-
-            container.innerHTML =
-                "<p>No challenges available yet.</p>";
-
-            return;
-        }
-
-
-        snapshot.forEach(challengeDoc => {
-
-            const challenge =
-                challengeDoc.data();
-
-
-            const card =
-                document.createElement("article");
-
-
-            card.className =
-                "challenge-card";
-
-
-            card.innerHTML = `
-
-                <h3>
-                    ${escapeHTML(
-                        challenge.title
-                    )}
-                </h3>
-
-                <p>
-                    ${escapeHTML(
-                        challenge.description
-                    )}
-                </p>
-
-                <strong>
-                    ${Number(
-                        challenge.poin
+       
