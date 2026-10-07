@@ -1,4 +1,4 @@
-alert("MISSION IMO JAVASCRIPT IS WORKING");
+
 /*====================================================
    MISSION IMO — COMPLETE FIREBASE SCRIPT
    ========================================================= */
